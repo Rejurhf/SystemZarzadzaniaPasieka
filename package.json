@@ -1,0 +1,12 @@
+{
+  "name": "systemzarzadzaniapasieka",
+  "version": "1.0.0",
+  "description": "System Zarzadzania Pasieka",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon app"
+  },
+  "author": "Rejurhf",
+  "license": "ISC"
+}
