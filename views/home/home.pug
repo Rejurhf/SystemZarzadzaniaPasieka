@@ -1,29 +1,13 @@
 extends ../layout
+include ../includes/header-links
 
-mixin message(opp, name)
-    if(opp)
-        h1.greeting Logged in as 
-            span=name 
-    else 
-        h1.greeting Welcome 
-            span=name 
-            |  to our website
-
-block header 
-    include ../includes/header
-        append links 
-            li
-                a(href="/home") Pasieka 
-            li
-                a(href="/home") Akcje 
-            li
-                a(href="/home") Historia
-            li(style="float: right;")
-                a(href="/loggout") Loggout 
+append links
+    +header('Home')
 
 block content
     .dashboard 
         .user 
-            +message(opp, name)
+            h1.greeting Logged in as 
+                span=name 
 
 

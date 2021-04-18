@@ -1,0 +1,11 @@
+//- 0 - Home
+//- 1 - Pasieka
+//- 2 - Akcje
+//- 3 - Historia
+mixin header(tab)
+    each val, key in {'/': 'Home', '/apiary': 'Pasieka', '/actions': 'Akcje', '/history': 'Historia'}
+        li
+            if val == tab 
+                a(class="selected" href= key)= val
+            else 
+                a(href= key)= val

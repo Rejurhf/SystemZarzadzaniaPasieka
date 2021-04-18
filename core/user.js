@@ -43,7 +43,7 @@ User.prototype = {
 
         pool.query(sql, bind, function(err, lastID){
             if(err) throw err;
-            console.log(lastID);
+            
             callback(lastID);
         });
     },

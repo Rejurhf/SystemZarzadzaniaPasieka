@@ -7,6 +7,7 @@ const fs = require('fs');
 
 const user = new User();
 
+// Login ----------------------------------------------------------------
 // Get index page
 router.get('/', (req, res, next) => {
     let user = req.session.user;
@@ -17,17 +18,6 @@ router.get('/', (req, res, next) => {
     }
 
     res.render('index', {title:"Pasieka"});
-})
-
-// Get Home page 
-router.get('/home', (req, res, next) => {
-    let user = req.session.user;
-
-    if(user){
-        res.render('home/home', {opp:req.session.opp, name:user.FirstName});
-        return;
-    }
-    res.redirect('/');
 })
 
 // Post login data
@@ -78,6 +68,54 @@ router.get('/loggout', (req, res, next) => {
         })
     }
 });
+
+// Home ----------------------------------------------------------------
+// Get Home page 
+router.get('/home', (req, res, next) => {
+    let user = req.session.user;
+
+    if(user){
+        res.render('home/home', {name:user.FirstName});
+        return;
+    }
+    res.redirect('/');
+})
+
+// Apiary ----------------------------------------------------------------
+// Get Apiary page 
+router.get('/apiary', (req, res, next) => {
+    let user = req.session.user;
+
+    if(user){
+        res.render('apiary/apiary');
+        return;
+    }
+    res.redirect('/');
+})
+
+// Actions ----------------------------------------------------------------
+// Get Actions page 
+router.get('/actions', (req, res, next) => {
+    let user = req.session.user;
+
+    if(user){
+        res.render('actions/actions');
+        return;
+    }
+    res.redirect('/');
+})
+
+// History ----------------------------------------------------------------
+// Get History page 
+router.get('/history', (req, res, next) => {
+    let user = req.session.user;
+
+    if(user){
+        res.render('history/history');
+        return;
+    }
+    res.redirect('/');
+})
 
 module.exports = router;
 

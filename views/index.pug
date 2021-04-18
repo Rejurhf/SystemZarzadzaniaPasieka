@@ -1,4 +1,11 @@
-extends layout 
-block content
-    .login-panel 
-        include includes/login-form
+doctype html
+html(lang="pl")
+    head 
+        title=title
+        include includes/styles 
+        link(rel="stylesheet" href="css/login.css")
+    body 
+        .page-wrapper 
+            .login-container
+                .login-panel 
+                    include includes/login-form

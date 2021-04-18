@@ -1,0 +1,31 @@
+extends ../layout
+include ../includes/header-links
+
+append styles 
+    link(rel="stylesheet" href="css/modal.css")
+
+append scripts 
+    script(src='js/modal.js')
+
+append links
+    +header('Pasieka')
+
+block content
+    .dashboard 
+        h1 Pasieka
+        .button-list
+            button(onclick="document.getElementById('modalAddApiary').style.display='block'") Dodaj Pasiekę
+            button Dodaj Grupę Uli 
+            button Dodaj Ul 
+            button Dodaj Rodzinę
+
+        div(id="modalAddApiary" class="modal")
+            .modal-content
+                .modal-header
+                    span(class="close" onclick="document.getElementById('modalAddApiary').style.display='none'") &times;
+                    h2 Modal Header 
+                .modal-body
+                    p Body
+                .modal-footer
+                    p Footer 
+
