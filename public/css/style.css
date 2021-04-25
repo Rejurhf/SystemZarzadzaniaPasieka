@@ -1,14 +1,8 @@
 * {padding: 0; margin: 0;}
 
 @font-face { 
-    font-family: 'Roboto'; 
-    src: url('../fonts/Roboto-Light.ttf');
-}
-
-@font-face { 
-    font-family: 'Roboto'; 
-    font-weight: bold;
-    src: url('../fonts/Roboto-Bold.ttf');
+    font-family: 'Helvetica'; 
+    src: url('../fonts/HelveticaLTStd-Blk.otf');
 }
 
 html, body {
@@ -17,7 +11,7 @@ html, body {
 }
 
 body{
-    font-family: 'Roboto', sans-serif;
+    font-family: Arial, sans-serif;
     font-size: 16px;
 }
 

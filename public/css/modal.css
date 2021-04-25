@@ -40,32 +40,60 @@
   }
   
 /* The Close Button */
-.close {
-    color: white;
-    float: right;
+.modal-header .close {
+    color: black;
     font-size: 28px;
     font-weight: bold;
+    position: absolute;
+    right: 4px;
+    top: -2px;
 }
   
 .close:hover,
 .close:focus {
-    color: #000;
+    color: red;
     text-decoration: none;
     cursor: pointer;
 }
 
 .modal-header {
-    padding: 2px 16px;
-    background-color: #5cb85c;
-    color: white;
+    padding: 4px 8px;
+    color: black;
+    border-bottom: gray 1px solid;
 }
 
 .modal-body {
-    padding: 2px 16px;
+    padding: 8px;
 }
   
 .modal-footer {
-    padding: 2px 16px;
-    background-color: #5cb85c;
+    padding: 2px 4px 4px 4px;
+    height: 45px;
     color: white;
+    border-top: gray 1px solid;
+}
+
+.modal-footer button {
+    float: right;
+}
+
+/* ---------------- Inputs ---------------- */
+.inputBox label{
+    padding-top: 6px;
+}
+
+.inputBox label{
+    display: inline-block;
+    width: 125px;
+}
+
+.inputBox input{
+    display: inline-block;
+    width: 200px;
+}
+
+/* ---------------- Other ---------------- */
+.inNotVal{
+    box-shadow: 0 0 6px red;
+    border-color: red;
 }

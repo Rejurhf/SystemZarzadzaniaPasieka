@@ -14,18 +14,11 @@ block content
     .dashboard 
         h1 Pasieka
         .button-list
-            button(onclick="document.getElementById('modalAddApiary').style.display='block'") Dodaj Pasiekę
-            button Dodaj Grupę Uli 
+            button(onclick="addApiary()") Dodaj Pasiekę
+            button(onclick="document.getElementById('modalAddGroup').style.display='block'") Dodaj Grupę Uli 
             button Dodaj Ul 
             button Dodaj Rodzinę
 
-        div(id="modalAddApiary" class="modal")
-            .modal-content
-                .modal-header
-                    span(class="close" onclick="document.getElementById('modalAddApiary').style.display='none'") &times;
-                    h2 Modal Header 
-                .modal-body
-                    p Body
-                .modal-footer
-                    p Footer 
-
+        include ../modals/add-apiary-modal
+        include ../modals/add-group-modal
+        

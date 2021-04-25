@@ -1,11 +1,13 @@
 
 const express = require('express');
 const User = require('../core/user');
+const Apiary = require('../core/apiary');
 const router = express.Router();
 
 const fs = require('fs');
 
 const user = new User();
+const apiary = new Apiary();
 
 // Login ----------------------------------------------------------------
 // Get index page
@@ -76,6 +78,7 @@ router.get('/home', (req, res, next) => {
 
     if(user){
         res.render('home/home', {name:user.FirstName});
+        console.log(user);
         return;
     }
     res.redirect('/');

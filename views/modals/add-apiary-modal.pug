@@ -1,0 +1,17 @@
+div(id="modalAddApiary" class="modal")
+    .modal-content(style="max-width: 350px")
+        .modal-header
+            span(class="close" onclick="document.getElementById('modalAddApiary').style.display='none'") &times;
+            h2 Dodaj Pasiekę
+        .modal-body
+            form(id="form-addapiary" method="post" action="/addapiary" onsubmit="return validateAddApiary();")
+                .inputBox.name
+                    label Nazwa: 
+                    input(type="text" name="apiaryName")
+                .inputBox.date
+                    label Data stworzenia:
+                    input(type="datetime-local" name="apiaryCreationDate") 
+                input(type="submit" id="submit-addapiary" style="display: none")
+        .modal-footer
+            button(onclick="closeAddApiary()") Anuluj
+            button(type="submit" form="form-addapiary" name="Add") Dodaj
