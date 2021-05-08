@@ -4,7 +4,7 @@ div(id="modalAddApiary" class="modal")
             span(class="close" onclick="document.getElementById('modalAddApiary').style.display='none'") &times;
             h2 Dodaj Pasiekę
         .modal-body
-            form(id="form-addapiary" method="post" action="/addapiary" onsubmit="return validateAddApiary();")
+            form(id="form-addapiary" method="post" action="/apiary" onsubmit="return validateAddApiary();")
                 .inputBox.name
                     label Nazwa: 
                     input(type="text" name="apiaryName")

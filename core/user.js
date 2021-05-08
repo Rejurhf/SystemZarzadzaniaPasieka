@@ -17,11 +17,12 @@ User.prototype = {
         // "SELECT * FROM user WHERE UserNo = `fieldCount` = 0, `affectedRows` = 1, `insertId` = 2, `serverStatus` = 2, `warningCount` = 0, `message` = '', `protocol41` = true, `changedRows` = 0"
         // lastID
 
-        let sql = `SELECT * FROM user WHERE ${field} = ?`;
+        let sql = `SELECT ID, FirstName, LastName, UserNo, Password FROM user 
+            WHERE ${field} = ?`;
 
         pool.query(sql, user, function(err, result) {
             if(err) throw err;
-
+ 
             if(result.length) {
                 callback(result[0]);
             }else
@@ -39,7 +40,9 @@ User.prototype = {
             bind.push(body[prop]);
         }
 
-        let sql = 'INSERT INTO user(FirstName, LastName, UserNo, Password, Active, CreatedBy, LastUpdatedBy) VALUES (?,?,?,?,?,?,?)';
+        let sql = `INSERT INTO user(FirstName, LastName, UserNo, Password, 
+                Active, CreatedBy, LastUpdatedBy) 
+            VALUES (?,?,?,?,?,?,?)`;
 
         pool.query(sql, bind, function(err, lastID){
             if(err) throw err;

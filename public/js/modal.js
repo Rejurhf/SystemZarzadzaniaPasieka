@@ -1,6 +1,4 @@
 
-const Apiary = require('../../core/apiary');
-
 // Add Apiary
 function addApiary(){
     document.getElementById('modalAddApiary').style.display = 'block';
@@ -21,16 +19,6 @@ function validateAddApiary(){
     if(!name){
         formNotValid = true;
         document.querySelector('#form-addapiary .name input').classList.add('inNotVal');
-    }else{
-        formNotValid = true;
-        let apiary = new Apiary();
-        apiary.findApiary(name, function(result){
-            if(result){
-                console.log(result);
-            }else{
-                console.log('empty');
-            }
-        })
     }
 
     if(!date){
@@ -44,6 +32,14 @@ function validateAddApiary(){
         }else{
            event.returnValue = false; // for IE as dont support preventDefault;
         }
+    }else{
+        if(event.preventDefault){
+            event.preventDefault();
+        }else{
+           event.returnValue = false; // for IE as dont support preventDefault;
+        }
+
+        submitForm(name, date)
     }
 }
 
@@ -57,4 +53,14 @@ function dateToInputString(date){
         z(date.getDate()) + 'T' +
         z(date.getHours()) + ':'  + 
         z(date.getMinutes()); 
+}
+
+function submitForm(name, date) {
+    let action = 'http://localhost:3000/apiary'
+    let http = new XMLHttpRequest();
+    http.open("POST", action, true);
+    http.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+    let params = `apiaryName=${name}&apiaryCreationDate=${date}`;
+    http.send(params);
+    closeAddApiary();
 }
