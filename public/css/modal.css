@@ -21,6 +21,8 @@
     padding: 0;
     border: 1px solid #888;
     width: 80%;
+    min-width: 225px;
+    max-width: 350px;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
     -webkit-animation-name: animatetop;
     -webkit-animation-duration: 0.4s;
@@ -92,8 +94,13 @@
     width: 200px;
 }
 
+.inputBox select{
+    display: inline-block;
+    width: 204px;
+}
+
 /* ---------------- Other ---------------- */
-.inNotVal{
+.notValid{
     box-shadow: 0 0 6px red;
     border-color: red;
 }

@@ -6,6 +6,7 @@ append styles
 
 append scripts 
     script(src='js/modal.js')
+    script(src='js/jQuery.js')
 
 append links
     +header('Pasieka')
@@ -14,8 +15,8 @@ block content
     .dashboard 
         h1 Pasieka
         .button-list
-            button(onclick="addApiary()") Dodaj Pasiekę
-            button(onclick="document.getElementById('modalAddGroup').style.display='block'") Dodaj Grupę Uli 
+            button(onclick="loadAddApiary()") Dodaj Pasiekę
+            button(onclick="loadAddGroup()") Dodaj Grupę Uli 
             button Dodaj Ul 
             button Dodaj Rodzinę
 

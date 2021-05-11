@@ -1,10 +1,21 @@
 div(id="modalAddGroup" class="modal")
     .modal-content
         .modal-header
-            span(class="close" onclick="document.getElementById('modalAddGroup').style.display='none'") &times;
-            h2 Modal Header 
+            span(class="close" onclick="closeModal('/group')") &times;
+            h2 Dodaj Grupę
         .modal-body
-            p Body Group
+            form(id="form-addgroup")
+                .inputBox.apiaryName
+                    label Pasieka: 
+                    select(name="apiaryName")
+                        option(value="") 
+                .inputBox.date
+                    label Data stworzenia:
+                    input(type="datetime-local" name="groupCreationDate") 
+                .inputBox.groupName
+                    label Nazwa grupy: 
+                    input(type="text" name="groupName")
+                input(type="submit" style="display: none")
         .modal-footer
-            button(onclick="document.getElementById('modalAddGroup').style.display='none'") Anuluj
+            button(onclick="closeModal('/group')") Anuluj
             button Dodaj

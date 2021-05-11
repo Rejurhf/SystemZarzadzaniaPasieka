@@ -53,17 +53,58 @@ router.post('/register', (req, res, next) => {
 router.post('/apiary', (req, res) => {
     let user = req.session.user;
 
-    apiary.createApiary(req.body.apiaryName, req.body.apiaryCreationDate, user.UserNo, 
-            function(lastID){
-        if(lastID === 'Apiary already exists'){
-            console.log('Apiary already exists.');
-        }else if(lastID){
-            console.log(`Apiary added ${req.body.apiaryName}`);
-        }else{
-            console.log('Failed to add apiary.');
-        }
-        res.end();
-    })
+    if(user == null || user == undefined){
+        console.log('User not authorized');
+        res.status(401).send('Nie znaleziono użytkownika spróbuj przeładować stronę.');
+    }else{
+        apiary.createApiary(req.body.apiaryName, req.body.apiaryCreationDate, user.UserNo, 
+                function(lastID){
+            if(lastID === 'Apiary already exists'){
+                console.log('Apiary already exists.');
+                res.status(200).send({
+                    isError: true, severity: 'Error', 
+                    message: 'Pasieka o tej nazwie już istnieje.'});
+            }else if(lastID){
+                console.log(`Apiary added ${req.body.apiaryName}`);
+                res.status(201).send({
+                    isError: false, severity: 'Success', 
+                    message: `Pasieka "${req.body.apiaryName}" dodana.`});
+            }else{
+                console.log('Failed to add apiary.');
+                res.status(200).send({
+                    isError: true, severity: 'Error', message: 'Nie można dodać pasieki.'});
+            }
+        })
+    }
+})
+
+// Apiary inserts ------------------------------------------------------------------------
+router.post('/group', (req, res) => {
+    let user = req.session.user;
+
+    if(user == null || user == undefined){
+        console.log('User not authorized');
+        res.status(401).send('Nie znaleziono użytkownika spróbuj przeładować stronę.');
+    }else{
+        apiary.createApiary(req.body.apiaryName, req.body.apiaryCreationDate, user.UserNo, 
+                function(lastID){
+            if(lastID === 'Apiary already exists'){
+                console.log('Apiary already exists.');
+                res.status(200).send({
+                    isError: true, severity: 'Error', 
+                    message: 'Pasieka o tej nazwie już istnieje.'});
+            }else if(lastID){
+                console.log(`Apiary added ${req.body.apiaryName}`);
+                res.status(201).send({
+                    isError: false, severity: 'Success', 
+                    message: `Pasieka "${req.body.apiaryName}" dodana.`});
+            }else{
+                console.log('Failed to add apiary.');
+                res.status(200).send({
+                    isError: true, severity: 'Error', message: 'Nie można dodać pasieki.'});
+            }
+        })
+    }
 })
 
 module.exports = router;
