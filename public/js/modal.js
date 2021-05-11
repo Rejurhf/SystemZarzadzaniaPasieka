@@ -2,66 +2,23 @@
 // Add Apiary ----------------------------------------------------------------------------
 function loadAddApiary(){
     document.getElementById('modalAddApiary').style.display = 'block';
-    document.querySelector('#form-addapiary .date input').value = 
+    document.querySelector('#modalAddApiary .apiaryCreationDate input').value = 
         dateToInputString(new Date());
-}
-
-function validateAddApiary(){
-    let isValid = true;
-    var name = document.querySelector('#form-addapiary .name input').value;
-    let date = document.querySelector('#form-addapiary .date input').value;
-
-    if(!name){
-        isValid = false;
-        document.querySelector('#form-addapiary .name input').classList.add('notValid');
-    }
-
-    if(!date){
-        isValid = false;
-        document.querySelector('#form-addapiary .date input').classList.add('notValid');
-    }
-
-    if (isValid){
-        submitForm('/apiary', {apiaryName: name, apiaryCreationDate: date});
-    }
 }
 
 // Add Group -----------------------------------------------------------------------------
 function loadAddGroup(){
     document.getElementById('modalAddGroup').style.display='block';
-    document.querySelector('#form-addgroup .date input').value = 
+    document.querySelector('#modalAddGroup .groupCreationDate input').value = 
         dateToInputString(new Date());
 }
 
-function validateAddGroup(){
-    let isValid = true;
-    let apiaryName = document.querySelector('#form-addgroup .apiaryName select').value;
-    let date = document.querySelector('#form-addgroup .date input').value;
-    let groupName = document.querySelector('#form-addgroup .groupName input').value;
-
-    if(!apiaryName){
-        isValid = false;
-        document.querySelector('#form-addgroup .apiaryName select').classList.add('notValid');
-    }
-    if(!date){
-        isValid = false;
-        document.querySelector('#form-addgroup .date input').classList.add('notValid');
-    }
-    if(!groupName){
-        isValid = false;
-        document.querySelector('#form-addgroup .groupName input').classList.add('notValid');
-    }
-
-    if (isValid){
-        let json = {apiaryName: apiaryName, 
-            groupCreationDate: date, 
-            groupName: groupName}
-        submitForm('/group', json);
-    }
-}
-
 // Add Hive ------------------------------------------------------------------------------
-
+function loadAddHive(){
+    document.getElementById('modalAddHive').style.display='block';
+    document.querySelector('#modalAddHive .hiveCreationDate input').value = 
+        dateToInputString(new Date());
+}
 
 // Add Family ----------------------------------------------------------------------------
 
@@ -78,7 +35,37 @@ function dateToInputString(date){
         z(date.getMinutes()); 
 }
 
-function submitForm(actionURL, dataDict) {
+function validateModal(elem){
+    let isValid = true;
+    let modal = elem.parentElement.parentElement;
+    let dataDict = {};
+
+    modal.querySelectorAll('input').forEach(e => {
+        if(e.name != null && e.name != undefined && e.name != '' && !dataDict[e.name]){
+            if(e.getAttribute('not-null') === 'true' && !e.value){
+                isValid = false;
+                e.classList.add('notValid');
+            }
+            dataDict[e.name] = e.value;
+        }
+    })
+    modal.querySelectorAll('select').forEach(e => {
+        if(e.name != null && e.name != undefined && e.name != '' && !dataDict[e.name]){
+            if(e.getAttribute('not-null') === 'true' && !e.value){
+                isValid = false;
+                e.classList.add('notValid');
+            }
+            dataDict[e.name] = e.value;
+        }
+    })
+    
+    if (isValid){
+        submitForm(modal, dataDict);
+    }
+}
+
+function submitForm(modal, dataDict) {
+    let actionURL = modal.getAttribute('action');
     $.ajax({
         url: actionURL,
         type: 'POST',
@@ -87,7 +74,7 @@ function submitForm(actionURL, dataDict) {
         success: function(data){
             createAlert(data.message, data.severity);
             if(!data.isError){
-                closeModal(actionURL);
+                closeModal(modal);
             }
         },
         error: function( jqXhr, textStatus, errorThrown ){
@@ -96,19 +83,14 @@ function submitForm(actionURL, dataDict) {
     })
 }
 
-function closeModal(actionURL){
-    if(actionURL === '/apiary'){
-        document.getElementById('modalAddApiary').style.display='none';
-        document.querySelector('#form-addapiary .name input')
-            .classList.remove('notValid');
-        document.querySelector('#form-addapiary .date input')
-            .classList.remove('notValid');
-    }else if(actionURL === '/group'){
-        document.getElementById('modalAddGroup').style.display='none';
-        document.querySelector('#form-addgroup .groupName input')
-            .classList.remove('notValid');
-        document.querySelector('#form-addgroup .date input').classList.remove('notValid');
-    }
+function closeModal(elem){
+    let modal = elem;
+    if(!elem.classList.contains('modal-content'))
+        modal = elem.parentElement.parentElement;
+
+    modal.parentElement.style.display = 'none';
+    modal.querySelectorAll('input').forEach(e => {e.classList.remove('notValid')});
+    modal.querySelectorAll('select').forEach(e => {e.classList.remove('notValid')});
 }
 
 function createAlert(message, severity){

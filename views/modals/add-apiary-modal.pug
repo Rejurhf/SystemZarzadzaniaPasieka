@@ -1,17 +1,17 @@
 div(id="modalAddApiary" class="modal")
-    .modal-content
+    .modal-content(action="/apiary")
         .modal-header
-            span(class="close" onclick="closeModal('/apiary')") &times;
+            span(class="close" onclick="closeModal(this)") &times;
             h2 Dodaj Pasiekę
         .modal-body
-            form(id="form-addapiary")
-                .inputBox.name
+            form
+                .inputBox.apiaryName
                     label Nazwa: 
-                    input(type="text" name="apiaryName")
-                .inputBox.date
+                    input(type="text" not-null="true" name="apiaryName")
+                .inputBox.apiaryCreationDate
                     label Data stworzenia:
-                    input(type="datetime-local" name="apiaryCreationDate") 
-                input(type="submit" style="display: none")
+                    input(type="datetime-local" not-null="true" 
+                        name="apiaryCreationDate") 
         .modal-footer
-            button(onclick="closeModal('/apiary')") Anuluj
-            button(name="Add" onclick="validateAddApiary()") Dodaj
+            button(onclick="closeModal(this)") Anuluj
+            button(onclick="validateModal(this)") Dodaj
