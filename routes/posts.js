@@ -57,7 +57,7 @@ router.post('/apiary', (req, res) => {
         console.log('User not authorized');
         res.status(401).send('Nie znaleziono użytkownika spróbuj przeładować stronę.');
     }else{
-        apiary.createApiary(req.body.apiaryName, req.body.apiaryCreationDate, user.UserNo, 
+        apiary.createApiary(req.body.apiaryName, req.body.creationDate, user.UserNo, 
                 function(lastID){
             if(lastID === 'Apiary already exists'){
                 console.log('Apiary already exists.');

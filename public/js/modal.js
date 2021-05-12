@@ -2,26 +2,30 @@
 // Add Apiary ----------------------------------------------------------------------------
 function loadAddApiary(){
     document.getElementById('modalAddApiary').style.display = 'block';
-    document.querySelector('#modalAddApiary .apiaryCreationDate input').value = 
+    document.querySelector('#modalAddApiary .creationDate input').value = 
         dateToInputString(new Date());
 }
 
 // Add Group -----------------------------------------------------------------------------
 function loadAddGroup(){
     document.getElementById('modalAddGroup').style.display='block';
-    document.querySelector('#modalAddGroup .groupCreationDate input').value = 
+    document.querySelector('#modalAddGroup .creationDate input').value = 
         dateToInputString(new Date());
 }
 
 // Add Hive ------------------------------------------------------------------------------
 function loadAddHive(){
     document.getElementById('modalAddHive').style.display='block';
-    document.querySelector('#modalAddHive .hiveCreationDate input').value = 
+    document.querySelector('#modalAddHive .creationDate input').value = 
         dateToInputString(new Date());
 }
 
 // Add Family ----------------------------------------------------------------------------
-
+function loadAddFamily(){
+    document.getElementById('modalAddFamily').style.display='block';
+    document.querySelector('#modalAddFamily .creationDate input').value = 
+        dateToInputString(new Date());
+}
 
 // Helper functions ----------------------------------------------------------------------
 // Return string date for datetime selector format "YYYY-mm-DDTHH:MM"

@@ -22,7 +22,7 @@
     border: 1px solid #888;
     width: 80%;
     min-width: 225px;
-    max-width: 350px;
+    max-width: 355px;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
     -webkit-animation-name: animatetop;
     -webkit-animation-duration: 0.4s;
@@ -82,9 +82,6 @@
 /* ---------------- Inputs ---------------- */
 .inputBox label{
     padding-top: 6px;
-}
-
-.inputBox label{
     display: inline-block;
     width: 125px;
 }
@@ -92,15 +89,17 @@
 .inputBox input{
     display: inline-block;
     width: 200px;
+    margin: 4px
 }
 
 .inputBox select{
     display: inline-block;
     width: 204px;
+    margin: 4px;
 }
 
 /* ---------------- Other ---------------- */
 .notValid{
-    box-shadow: 0 0 6px red;
+    box-shadow: 0 0 6px rgb(209, 0, 0);
     border-color: red;
 }

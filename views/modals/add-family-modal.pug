@@ -1,8 +1,8 @@
-div(id="modalAddGroup" class="modal")
-    .modal-content(action="/group")
+div(id="modalAddFamily" class="modal")
+    .modal-content(action="/family")
         .modal-header
             span(class="close" onclick="closeModal(this)") &times;
-            h2 Dodaj Grupę
+            h2 Dodaj Rodzinę
         .modal-body
             form
                 .inputBox.apiaryName
@@ -11,7 +11,12 @@ div(id="modalAddGroup" class="modal")
                         option(value="") 
                 .inputBox.groupName
                     label Nazwa grupy: 
-                    input(type="text" not-null="true" name="groupName")
+                    select(name="groupName")
+                        option(value="")
+                .inputBox.hiveNum
+                    label Numer ula: 
+                    select(not-null="true" name="hiveNum")
+                        option(value="")
                 .inputBox.creationDate
                     label Data stworzenia:
                     input(type="datetime-local" not-null="true" 

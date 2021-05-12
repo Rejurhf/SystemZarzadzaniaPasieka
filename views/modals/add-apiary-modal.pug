@@ -8,10 +8,10 @@ div(id="modalAddApiary" class="modal")
                 .inputBox.apiaryName
                     label Nazwa: 
                     input(type="text" not-null="true" name="apiaryName")
-                .inputBox.apiaryCreationDate
+                .inputBox.creationDate
                     label Data stworzenia:
                     input(type="datetime-local" not-null="true" 
-                        name="apiaryCreationDate") 
+                        name="creationDate") 
         .modal-footer
             button(onclick="closeModal(this)") Anuluj
             button(onclick="validateModal(this)") Dodaj
