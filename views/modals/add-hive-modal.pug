@@ -7,7 +7,8 @@ div(id="modalAddHive" class="modal")
             form
                 .inputBox.apiaryName
                     label Pasieka: 
-                    select(not-null="true" name="apiaryName")
+                    select(not-null="true" name="apiaryName" 
+                            onchange="onChangeApiary(this)")
                         option(value="") 
                 .inputBox.groupName
                     label Nazwa grupy: 

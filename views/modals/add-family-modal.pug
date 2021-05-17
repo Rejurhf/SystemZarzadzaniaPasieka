@@ -7,11 +7,12 @@ div(id="modalAddFamily" class="modal")
             form
                 .inputBox.apiaryName
                     label Pasieka: 
-                    select(not-null="true" name="apiaryName")
-                        option(value="") 
+                    select(not-null="true" name="apiaryName" 
+                            onchange="onChangeApiary(this)")
+                        option(value="")
                 .inputBox.groupName
                     label Nazwa grupy: 
-                    select(name="groupName")
+                    select(name="groupName" onchange="onChangeGroup(this)")
                         option(value="")
                 .inputBox.hiveNum
                     label Numer ula: 

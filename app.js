@@ -4,6 +4,7 @@ const session = require('express-session');
 const path = require('path');
 const pageRouter = require('./routes/pages');
 const postsRouter = require('./routes/posts');
+const getsRouter = require('./routes/gets');
 const app = express();
 
 // For body parser
@@ -30,6 +31,7 @@ app.use(session({
 // Routers
 app.use('/', pageRouter);
 app.use('/', postsRouter);
+app.use('/', getsRouter);
 
 // Errors : page not found 404
 app.use((req, res, next) => {

@@ -32,24 +32,88 @@ Apiary.prototype = {
         });
     },
 
-    createApiary: function(name, creationDate, createdBy, callback){
+    findUserApiaries: function(userID, callback){
+        let sql = `SELECT A.ID, A.Name
+                    FROM user_apiary UA
+                        JOIN apiary A
+                            ON A.ID = UA.ApiaryID
+                            AND A.Active = 1
+                    WHERE UA.UserID = ?`
+
+        pool.query(sql, userID, function(err, result){
+            if(err) throw err;
+
+            if(result.length) {
+                callback(result);
+            }else
+                callback(null);
+        })
+    },
+
+    findUserHiveGroups: function(apiaryID, callback){
+        let sql = `SELECT HG.ID, HG.Name
+                    FROM hive_group HG
+                    WHERE HG.ApiaryID = ?
+                        AND HG.Active = 1`
+
+        pool.query(sql, apiaryID, function(err, result){
+            if(err) throw err;
+
+            if(result.length) {
+                callback(result);
+            }else
+                callback(null);
+        })
+    },
+
+    findUserHives: function(apiaryID, groupID, callback){
+        let sql = `SELECT H.ID, H.Number
+                    FROM hive H
+                    WHERE H.ApiaryID = ?
+                        AND ((H.GroupID IS NULL AND ? < 1)
+                            OR H.GroupID = ?)
+                        AND H.Active = 1`
+
+        let bind = [apiaryID, groupID, groupID];
+
+        pool.query(sql, bind, function(err, result){
+            if(err) throw err;
+
+            if(result.length) {
+                callback(result);
+            }else
+                callback(null);
+        })
+    },
+
+    createApiary: function(name, creationDate, createdBy, userID, callback){
         let apiaryNo = name.replace(/\s/g, '');
 
-        this.findApiary(apiaryNo, 'ApiaryNo', function(apiary){
+        this.findApiary(apiaryNo, 'ApiaryNo', async function(apiary){
             if(apiary){
-               callback('Apiary already exists'); 
+                callback('Apiary already exists'); 
             }else{
-                let sql = `INSERT INTO apiary(Name, ApiaryNo, StartTime, 
+                let sqlInsApr = `INSERT INTO apiary(Name, ApiaryNo, StartTime, 
                         CreatedBy, LastUpdatedBy, Active)
                     VALUES(?, ?, ?, ?, ?, 1)`;
+                let sqlInsUsrApr = `INSERT INTO user_apiary(UserID, ApiaryID, 
+                        CreatedBy, LastUpdatedBy, Active)
+                    VALUES(?, ?, ?, ?, 1)`
                 
-                let bind = [name, apiaryNo, creationDate, createdBy, createdBy];
+                let bindApr = [name, apiaryNo, creationDate, createdBy, createdBy];
                 
-                pool.query(sql, bind, function(err, lastID) {
-                    if(err) throw err;
-         
-                    callback(lastID);
-                });
+                try {
+                    let result = await pool.query(sqlInsApr, bindApr);
+
+                    var apiaryID = result.insertId;
+                    let bindUsrApr = [userID, apiaryID, createdBy, createdBy];
+                    
+                    result = await pool.query(sqlInsUsrApr, bindUsrApr);
+                }catch(err){
+                    throw new Error(err);
+                }
+                
+                callback(apiaryID);
             }
         });
     }

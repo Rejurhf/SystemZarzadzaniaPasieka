@@ -1,30 +1,41 @@
 
 // Add Apiary ----------------------------------------------------------------------------
 function loadAddApiary(){
-    document.getElementById('modalAddApiary').style.display = 'block';
-    document.querySelector('#modalAddApiary .creationDate input').value = 
-        dateToInputString(new Date());
+    let modal = document.getElementById('modalAddApiary'); 
+    modal.style.display = 'block';
+    modal.querySelector('.creationDate input').value = dateToInputString(new Date());
+
+    apiariesDropdown(modal);
 }
 
 // Add Group -----------------------------------------------------------------------------
 function loadAddGroup(){
-    document.getElementById('modalAddGroup').style.display='block';
-    document.querySelector('#modalAddGroup .creationDate input').value = 
-        dateToInputString(new Date());
+    let modal = document.getElementById('modalAddGroup');
+    modal.style.display='block';
+    modal.querySelector('.creationDate input').value = dateToInputString(new Date());
+
+    apiariesDropdown(modal);
 }
 
 // Add Hive ------------------------------------------------------------------------------
 function loadAddHive(){
-    document.getElementById('modalAddHive').style.display='block';
-    document.querySelector('#modalAddHive .creationDate input').value = 
-        dateToInputString(new Date());
+    let modal = document.getElementById('modalAddHive');
+    modal.style.display='block';
+    modal.querySelector('.creationDate input').value = dateToInputString(new Date());
+
+    apiariesDropdown(modal);
+    groupsDropdown(modal);
 }
 
 // Add Family ----------------------------------------------------------------------------
 function loadAddFamily(){
-    document.getElementById('modalAddFamily').style.display='block';
-    document.querySelector('#modalAddFamily .creationDate input').value = 
-        dateToInputString(new Date());
+    let modal = document.getElementById('modalAddFamily');
+    modal.style.display='block';
+    modal.querySelector('.creationDate input').value = dateToInputString(new Date());
+        
+    apiariesDropdown(modal);
+    groupsDropdown(modal);
+    hivesDropdown(modal);
 }
 
 // Helper functions ----------------------------------------------------------------------
@@ -44,6 +55,7 @@ function validateModal(elem){
     let modal = elem.parentElement.parentElement;
     let dataDict = {};
 
+
     modal.querySelectorAll('input').forEach(e => {
         if(e.name != null && e.name != undefined && e.name != '' && !dataDict[e.name]){
             if(e.getAttribute('not-null') === 'true' && !e.value){
@@ -62,6 +74,8 @@ function validateModal(elem){
             dataDict[e.name] = e.value;
         }
     })
+
+    console.log(["validate", isValid]);
     
     if (isValid){
         submitForm(modal, dataDict);
@@ -70,6 +84,7 @@ function validateModal(elem){
 
 function submitForm(modal, dataDict) {
     let actionURL = modal.getAttribute('action');
+    
     $.ajax({
         url: actionURL,
         type: 'POST',
@@ -110,4 +125,113 @@ function createAlert(message, severity){
     alertBox.appendChild(alert);
     setTimeout(function(){alert.remove();}, 30000);
 }
+
+// Dropdowns -----------------------------------------------------------------------------
+function apiariesDropdown(modal){
+    let select = modal.querySelector('.apiaryName select');
+
+    // Get dropdown data
+    if(select){
+        $.ajax({
+            url: '/apiaries',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data){
+                if(data.length){
+                    select.innerHTML = '';
+            
+                    data.forEach(e => {
+                        let opt = document.createElement('option');
+                        opt.value = e.ID;
+                        opt.innerHTML = e.Name;
+                        select.appendChild(opt);
+                    })      
+                }
+            },
+            error: function( jqXhr, textStatus, errorThrown ){
+                createAlert(jqXhr.responseText, 'Error');
+            }
+        })
+    }
+}
+
+function groupsDropdown(modal){
+    let apiaryID = parseInt(modal.querySelector('.apiaryName select').value);
+    let dataDict = {apiaryID: apiaryID};
+    let select = modal.querySelector('.groupName select');
+
+    // Get dropdown data
+    if(select){
+        $.ajax({
+            url: '/groups',
+            type: 'GET',
+            dataType: 'json',
+            data: dataDict,
+            success: function(data){
+                if(data.length){
+                    select.innerHTML = '';
+                    select.appendChild(document.createElement('option'));
+    
+                    data.forEach(e => {
+                        let opt = document.createElement('option');
+                        opt.value = e.ID;
+                        opt.innerHTML = e.Name;
+                        select.appendChild(opt);
+                    })      
+                }
+            },
+            error: function( jqXhr, textStatus, errorThrown ){
+                createAlert(jqXhr.responseText, 'Error');
+            }
+        })
+    }
+}
+
+function hivesDropdown(modal){
+    let apiaryID = parseInt(modal.querySelector('.apiaryName select').value);
+    let groupID = parseInt(modal.querySelector('.groupName select').value);
+    let dataDict = {apiaryID: apiaryID, groupID: groupID};
+    let select = modal.querySelector('.hiveNum select');
+
+    // Get dropdown data
+    if(select){
+        $.ajax({
+            url: '/hives',
+            type: 'GET',
+            dataType: 'json',
+            data: dataDict,
+            success: function(data){
+                if(data.length){
+                    select.innerHTML = '';
+    
+                    data.forEach(e => {
+                        let opt = document.createElement('option');
+                        opt.value = e.ID;
+                        opt.innerHTML = e.Name;
+                        select.appendChild(opt);
+                    });
+                }
+            },
+            error: function( jqXhr, textStatus, errorThrown ){
+                createAlert(jqXhr.responseText, 'Error');
+            }
+        })
+    }
+}
+
+// On Changes ----------------------------------------------------------------------------
+function onChangeApiary(elem){
+    let modal = $(elem).closest('.modal')[0];
+    
+    groupsDropdown(modal);
+    hivesDropdown(modal);
+}
+
+function onChangeGroup(elem){
+    let modal = $(elem).closest('.modal')[0];
+    
+    hivesDropdown(modal);
+}
+
+
 

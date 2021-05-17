@@ -2,7 +2,6 @@
 const express = require('express');
 const User = require('../core/user');
 const Apiary = require('../core/apiary');
-const e = require('express');
 const router = express.Router();
 
 const user = new User();
@@ -51,14 +50,14 @@ router.post('/register', (req, res, next) => {
 
 // Apiary inserts ------------------------------------------------------------------------
 router.post('/apiary', (req, res) => {
-    let user = req.session.user;
+    let sUser = req.session.user;
 
-    if(user == null || user == undefined){
+    if(sUser == null || sUser == undefined){
         console.log('User not authorized');
         res.status(401).send('Nie znaleziono użytkownika spróbuj przeładować stronę.');
     }else{
-        apiary.createApiary(req.body.apiaryName, req.body.creationDate, user.UserNo, 
-                function(lastID){
+        apiary.createApiary(req.body.apiaryName, req.body.creationDate, sUser.UserNo, 
+                sUser.ID, function(lastID){
             if(lastID === 'Apiary already exists'){
                 console.log('Apiary already exists.');
                 res.status(200).send({
@@ -72,39 +71,41 @@ router.post('/apiary', (req, res) => {
             }else{
                 console.log('Failed to add apiary.');
                 res.status(200).send({
-                    isError: true, severity: 'Error', message: 'Nie można dodać pasieki.'});
+                    isError: true, severity: 'Error', 
+                        message: 'Nie można dodać pasieki.'});
             }
         })
     }
 })
 
 // Apiary inserts ------------------------------------------------------------------------
-router.post('/group', (req, res) => {
-    let user = req.session.user;
+// router.post('/group', (req, res) => {
+//     let sUser = req.session.user;
+//     console.log([])
 
-    if(user == null || user == undefined){
-        console.log('User not authorized');
-        res.status(401).send('Nie znaleziono użytkownika spróbuj przeładować stronę.');
-    }else{
-        apiary.createApiary(req.body.apiaryName, req.body.apiaryCreationDate, user.UserNo, 
-                function(lastID){
-            if(lastID === 'Apiary already exists'){
-                console.log('Apiary already exists.');
-                res.status(200).send({
-                    isError: true, severity: 'Error', 
-                    message: 'Pasieka o tej nazwie już istnieje.'});
-            }else if(lastID){
-                console.log(`Apiary added ${req.body.apiaryName}`);
-                res.status(201).send({
-                    isError: false, severity: 'Success', 
-                    message: `Pasieka "${req.body.apiaryName}" dodana.`});
-            }else{
-                console.log('Failed to add apiary.');
-                res.status(200).send({
-                    isError: true, severity: 'Error', message: 'Nie można dodać pasieki.'});
-            }
-        })
-    }
-})
+//     if(sUser == null || sUser == undefined){
+//         console.log('User not authorized');
+//         res.status(401).send('Nie znaleziono użytkownika spróbuj przeładować stronę.');
+//     }else{
+//         apiary.createApiary(req.body.apiaryName, req.body.apiaryCreationDate, sUser.UserNo, 
+//                 function(lastID){
+//             if(lastID === 'Apiary already exists'){
+//                 console.log('Apiary already exists.');
+//                 res.status(200).send({
+//                     isError: true, severity: 'Error', 
+//                     message: 'Pasieka o tej nazwie już istnieje.'});
+//             }else if(lastID){
+//                 console.log(`Apiary added ${req.body.apiaryName}`);
+//                 res.status(201).send({
+//                     isError: false, severity: 'Success', 
+//                     message: `Pasieka "${req.body.apiaryName}" dodana.`});
+//             }else{
+//                 console.log('Failed to add apiary.');
+//                 res.status(200).send({
+//                     isError: true, severity: 'Error', message: 'Nie można dodać pasieki.'});
+//             }
+//         })
+//     }
+// })
 
 module.exports = router;
