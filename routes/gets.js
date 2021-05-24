@@ -8,11 +8,9 @@ const apiary = new Apiary();
 // Apiary GET ----------------------------------------------------------------------------
 router.get('/apiaries', (req, res) => {
     let sUserID = req.session.user.ID; 
-    console.log(req.session);
     
     if(sUserID)
         apiary.findUserApiaries(sUserID, function(result){
-            console.log(result);
             res.json(result);
         })
     else{
@@ -25,7 +23,6 @@ router.get('/groups', (req, res) => {
     
     if(apiaryID)
         apiary.findUserHiveGroups(apiaryID, function(result){
-            console.log(result);
             res.json(result);
         })
     else{
@@ -39,7 +36,6 @@ router.get('/hives', (req, res) => {
     
     if(apiaryID)
         apiary.findUserHives(apiaryID, groupID, function(result){
-            console.log(result);
             res.json(result);
         })
     else{

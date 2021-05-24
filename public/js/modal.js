@@ -128,7 +128,7 @@ function createAlert(message, severity){
 
 // Dropdowns -----------------------------------------------------------------------------
 function apiariesDropdown(modal){
-    let select = modal.querySelector('.apiaryName select');
+    let select = modal.querySelector('.apiaryID select');
 
     // Get dropdown data
     if(select){

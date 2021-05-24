@@ -19,17 +19,19 @@ Apiary.prototype = {
         });
     },
 
-    findApiary: function(apiary = null, key, callback){
-        let sql = `SELECT Name FROM apiary WHERE ${key} = ?`;
+    findApiary: async function(apiary = null, key){
+        let sql = `SELECT ID, Name FROM apiary WHERE ${key} = ?`;
 
-        pool.query(sql, apiary, function(err, result){
-            if(err) throw err;
+        try {
+            let result = await pool.query(sql, apiary);
 
-            if(result.length) {
-                callback(result[0]);
-            }else
-                callback(null);
-        });
+            if(result.length)
+                return result[0];
+        } catch (err){
+            throw new Error(err);
+        }
+
+        return;
     },
 
     findUserApiaries: function(userID, callback){
@@ -86,36 +88,83 @@ Apiary.prototype = {
         })
     },
 
-    createApiary: function(name, creationDate, createdBy, userID, callback){
+    findGroup: async function(groupName, apiaryID){
+        let sql = `SELECT ID, Name FROM hive_group WHERE ApiaryID = ? AND Name = ?`;
+
+        try {
+            let result = await pool.query(sql, [apiaryID, groupName]);
+
+            if(result.length)
+                return result[0];
+        } catch (err){
+            throw new Error(err);
+        }
+
+        return;
+    },
+
+    createApiary: async function(name, creationDate, createdBy, userID, callback){
         let apiaryNo = name.replace(/\s/g, '');
+        let sqlInsApr = `INSERT INTO apiary(Name, ApiaryNo, StartTime, 
+            CreatedBy, LastUpdatedBy, Active)
+            VALUES(?, ?, ?, ?, ?, 1)`;
+        let sqlInsUsrApr = `INSERT INTO user_apiary(UserID, ApiaryID, 
+                CreatedBy, LastUpdatedBy, Active)
+            VALUES(?, ?, ?, ?, 1)`
+        let bindApr = [name, apiaryNo, creationDate, createdBy, createdBy];
 
-        this.findApiary(apiaryNo, 'ApiaryNo', async function(apiary){
-            if(apiary){
-                callback('Apiary already exists'); 
-            }else{
-                let sqlInsApr = `INSERT INTO apiary(Name, ApiaryNo, StartTime, 
-                        CreatedBy, LastUpdatedBy, Active)
-                    VALUES(?, ?, ?, ?, ?, 1)`;
-                let sqlInsUsrApr = `INSERT INTO user_apiary(UserID, ApiaryID, 
-                        CreatedBy, LastUpdatedBy, Active)
-                    VALUES(?, ?, ?, ?, 1)`
-                
-                let bindApr = [name, apiaryNo, creationDate, createdBy, createdBy];
-                
-                try {
-                    let result = await pool.query(sqlInsApr, bindApr);
+        try {
+            let apiaryFound = await this.findApiary(apiaryNo, 'ApiaryNo');
+            
+            if(apiaryFound)
+                throw 'APIARY_ALREADY_EXISTS';
 
-                    var apiaryID = result.insertId;
-                    let bindUsrApr = [userID, apiaryID, createdBy, createdBy];
-                    
-                    result = await pool.query(sqlInsUsrApr, bindUsrApr);
-                }catch(err){
-                    throw new Error(err);
-                }
-                
-                callback(apiaryID);
-            }
-        });
+            let result = await pool.query(sqlInsApr, bindApr);
+
+            var apiaryID = result.insertId;
+            let bindUsrApr = [userID, apiaryID, createdBy, createdBy];
+            
+            result = await pool.query(sqlInsUsrApr, bindUsrApr);
+
+            if(result)
+                callback('SUCCESS');
+            else
+                callback(null);
+        } catch (err) {
+            callback(err);
+        }
+    },
+
+    createGroup: async function(apiaryID, groupName, creationDate, createdBy, callback){
+        let sql = `INSERT INTO hive_group(Name, ApiaryID, StartTime, 
+            CreatedBy, LastUpdatedBy, Active)
+        VALUES(?, ?, ?, ?, ?, 1)`;
+        let bind = [groupName, apiaryID, creationDate, createdBy, createdBy];
+
+        try {
+            let apiaryFound = this.findApiary(apiaryID, 'ID');
+            let groupFound = this.findGroup(groupName, apiaryID);
+
+            let result = await Promise.all([apiaryFound, groupFound]);
+            
+            if(!result[0])
+                throw 'APIARY_NOT_FOUND';
+            if(result[1])
+                throw 'GROUP_ALREADY_EXISTS';
+
+            pool.query(sql, bind, function(err, group){
+                if(err) throw err;
+
+                console.log(group, group.length);
+    
+                if(group) {
+                    callback('SUCCESS');
+                }else
+                    callback(null);
+            });
+        } catch (err) {
+            callback(err);
+        }
     }
 }
 
