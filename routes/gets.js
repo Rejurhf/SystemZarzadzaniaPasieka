@@ -18,17 +18,6 @@ router.get('/apiaries', (req, res) => {
     }
 })
 
-router.get('/groups', (req, res) => {
-    let apiaryID = req.body.apiaryID; 
-    
-    if(apiaryID)
-        apiary.findUserHiveGroups(apiaryID, function(result){
-            res.json(result);
-        })
-    else{
-        res.json({})
-    }
-})
 
 router.get('/hives', (req, res) => {
     let apiaryID = req.body.apiaryID; 

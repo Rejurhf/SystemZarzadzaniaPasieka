@@ -156,19 +156,19 @@ function apiariesDropdown(modal){
 }
 
 function groupsDropdown(modal){
-    let apiaryID = parseInt(modal.querySelector('.apiaryName select').value);
+    let apiaryID = modal.querySelector('.apiaryID select').value;
     let dataDict = {apiaryID: apiaryID};
-    let select = modal.querySelector('.groupName select');
+    let select = modal.querySelector('.groupID select');
 
     // Get dropdown data
     if(select){
         $.ajax({
             url: '/groups',
-            type: 'GET',
+            type: 'POST',
             dataType: 'json',
             data: dataDict,
             success: function(data){
-                if(data.length){
+                if(data){
                     select.innerHTML = '';
                     select.appendChild(document.createElement('option'));
     
@@ -178,6 +178,8 @@ function groupsDropdown(modal){
                         opt.innerHTML = e.Name;
                         select.appendChild(opt);
                     })      
+                }else{
+                    select.innerHTML = '';
                 }
             },
             error: function( jqXhr, textStatus, errorThrown ){
@@ -188,13 +190,14 @@ function groupsDropdown(modal){
 }
 
 function hivesDropdown(modal){
-    let apiaryID = parseInt(modal.querySelector('.apiaryName select').value);
-    let groupID = parseInt(modal.querySelector('.groupName select').value);
-    let dataDict = {apiaryID: apiaryID, groupID: groupID};
     let select = modal.querySelector('.hiveNum select');
 
-    // Get dropdown data
     if(select){
+        let apiaryID = parseInt(modal.querySelector('.apiaryName select').value);
+        let groupID = parseInt(modal.querySelector('.groupName select').value);
+        let dataDict = {apiaryID: apiaryID, groupID: groupID};
+
+        // Get dropdown data
         $.ajax({
             url: '/hives',
             type: 'GET',

@@ -48,6 +48,27 @@ router.post('/register', (req, res, next) => {
     })
 });
 
+// Gets ----------------------------------------------------------------------------------
+router.post('/groups', (req, res) => {
+    let apiaryID = req.body.apiaryID;
+    let sUserID = req.session.user.ID;
+    
+    if(apiaryID && apiaryID != ''){
+        apiary.findUserHiveGroups(parseInt(apiaryID), function(result){
+            res.json(result);
+        })
+    }else{
+        apiary.findUserApiaries(sUserID, function(result){
+            if(result.length){
+                apiary.findUserHiveGroups(result[0].ID, function(result){
+                    res.json(result);
+                })
+            }else
+                res.json({})
+        })
+    }
+})
+
 // Apiary inserts ------------------------------------------------------------------------
 router.post('/apiary', (req, res) => {
     let sUser = req.session.user;
@@ -78,7 +99,6 @@ router.post('/apiary', (req, res) => {
     }
 })
 
-// Apiary inserts ------------------------------------------------------------------------
 router.post('/group', (req, res) => {
     let sUser = req.session.user;
 
@@ -113,5 +133,44 @@ router.post('/group', (req, res) => {
         })
     }
 })
+
+router.post('/hive', (req, res) => {
+    let sUser = req.session.user;
+
+    if(sUser == null || sUser == undefined){
+        console.log(['post /hive', 'User not authorized']);
+        res.status(401).send('Nie znaleziono użytkownika spróbuj przeładować stronę.');
+    }else{
+        apiary.createHive(req.body.apiaryID, req.body.groupID, req.body.hiveNum, 
+                req.body.creationDate, sUser.UserNo, function(result){
+            if(result === 'SUCCESS'){
+                console.log(['post /hive', `Hive added ${req.body.groupName}`]);
+                res.status(201).send({
+                    isError: false, severity: 'Success', 
+                    message: `Ul "${req.body.hiveNum}" został dodany do pasieki.`});
+            }else if(result){
+                console.log(['post /hive', result]);
+                let message = 'Coś poszło nie tak.';
+
+                if(result === 'APIARY_NOT_FOUND')
+                    message = 'Nie ma pasieki o tej nazwie.';
+                else if(result === 'GROUP_NOT_FOUND')
+                    message = 'Nie ma grupy o tej nazwie.';
+                else if(result === 'HIVE_ALREADY_EXISTS')
+                    message = 'Ul o tym numerze już istnieje.';
+
+                res.status(200).send({
+                    isError: true, severity: 'Error', 
+                    message: message});
+            }else{
+                console.log(['post /hive', 'Failed to add apiary.']);
+                res.status(200).send({
+                    isError: true, severity: 'Error', message: 'Nie można dodać pasieki.'});
+            }
+        })
+    }
+})
+
+
 
 module.exports = router;
