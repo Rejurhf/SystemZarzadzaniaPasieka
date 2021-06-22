@@ -11,7 +11,7 @@ function loadAddApiary(){
 // Add Group -----------------------------------------------------------------------------
 function loadAddGroup(){
     let modal = document.getElementById('modalAddGroup');
-    modal.style.display='block';
+    modal.style.display = 'block';
     modal.querySelector('.creationDate input').value = dateToInputString(new Date());
 
     apiariesDropdown(modal);
@@ -20,7 +20,7 @@ function loadAddGroup(){
 // Add Hive ------------------------------------------------------------------------------
 function loadAddHive(){
     let modal = document.getElementById('modalAddHive');
-    modal.style.display='block';
+    modal.style.display = 'block';
     modal.querySelector('.creationDate input').value = dateToInputString(new Date());
 
     apiariesDropdown(modal);
@@ -30,7 +30,7 @@ function loadAddHive(){
 // Add Family ----------------------------------------------------------------------------
 function loadAddFamily(){
     let modal = document.getElementById('modalAddFamily');
-    modal.style.display='block';
+    modal.style.display = 'block';
     modal.querySelector('.creationDate input').value = dateToInputString(new Date());
         
     apiariesDropdown(modal);
@@ -71,6 +71,7 @@ function validateModal(elem){
                 isValid = false;
                 e.classList.add('notValid');
             }
+            console.log([e.name, e.value]);
             dataDict[e.name] = e.value;
         }
     })
@@ -145,7 +146,7 @@ function apiariesDropdown(modal){
                         opt.value = e.ID;
                         opt.innerHTML = e.Name;
                         select.appendChild(opt);
-                    })      
+                    })
                 }
             },
             error: function( jqXhr, textStatus, errorThrown ){
@@ -156,12 +157,13 @@ function apiariesDropdown(modal){
 }
 
 function groupsDropdown(modal){
-    let apiaryID = modal.querySelector('.apiaryID select').value;
-    let dataDict = {apiaryID: apiaryID};
     let select = modal.querySelector('.groupID select');
 
     // Get dropdown data
     if(select){
+        let apiaryID = modal.querySelector('.apiaryID select').value;
+        let dataDict = {apiaryID: apiaryID};
+
         $.ajax({
             url: '/groups',
             type: 'POST',
@@ -190,22 +192,25 @@ function groupsDropdown(modal){
 }
 
 function hivesDropdown(modal){
-    let select = modal.querySelector('.hiveNum select');
+    let select = modal.querySelector('.hiveID select');
 
     if(select){
-        let apiaryID = parseInt(modal.querySelector('.apiaryName select').value);
-        let groupID = parseInt(modal.querySelector('.groupName select').value);
+        let apiaryID = modal.querySelector('.apiaryID select').value;
+        let groupID = modal.querySelector('.groupID select').value;
         let dataDict = {apiaryID: apiaryID, groupID: groupID};
 
         // Get dropdown data
         $.ajax({
             url: '/hives',
-            type: 'GET',
+            type: 'POST',
             dataType: 'json',
             data: dataDict,
             success: function(data){
                 if(data.length){
                     select.innerHTML = '';
+
+                    if(data.length > 1)
+                        select.appendChild(document.createElement('option'));
     
                     data.forEach(e => {
                         let opt = document.createElement('option');

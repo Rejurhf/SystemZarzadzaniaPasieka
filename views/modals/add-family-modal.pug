@@ -10,18 +10,19 @@ div(id="modalAddFamily" class="modal")
                     select(not-null="true" name="apiaryID" 
                             onchange="onChangeApiary(this)")
                         option(value="")
-                .inputBox.groupName
+                .inputBox.groupID
                     label Nazwa grupy: 
-                    select(name="groupName" onchange="onChangeGroup(this)")
+                    select(name="groupID" onchange="onChangeGroup(this)")
                         option(value="")
-                .inputBox.hiveNum
+                .inputBox.hiveID
                     label Numer ula: 
-                    select(not-null="true" name="hiveNum")
+                    select(not-null="true" name="hiveID")
                         option(value="")
                 .inputBox.creationDate
                     label Data stworzenia:
                     input(type="datetime-local" not-null="true" 
                         name="creationDate") 
+        hr
         .modal-footer
             button(onclick="closeModal(this)") Anuluj
             button(onclick="validateModal(this)") Dodaj

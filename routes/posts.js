@@ -48,30 +48,11 @@ router.post('/register', (req, res, next) => {
     })
 });
 
-// Gets ----------------------------------------------------------------------------------
-router.post('/groups', (req, res) => {
-    let apiaryID = req.body.apiaryID;
-    let sUserID = req.session.user.ID;
-    
-    if(apiaryID && apiaryID != ''){
-        apiary.findUserHiveGroups(parseInt(apiaryID), function(result){
-            res.json(result);
-        })
-    }else{
-        apiary.findUserApiaries(sUserID, function(result){
-            if(result.length){
-                apiary.findUserHiveGroups(result[0].ID, function(result){
-                    res.json(result);
-                })
-            }else
-                res.json({})
-        })
-    }
-})
-
-// Apiary inserts ------------------------------------------------------------------------
+// Add -----------------------------------------------------------------------------------
+// Add Apiaary
 router.post('/apiary', (req, res) => {
     let sUser = req.session.user;
+    console.log(['post /apiary:', req.body]);
 
     if(sUser == null || sUser == undefined){
         console.log(['post /apiary:', 'User not authorized']);
@@ -79,18 +60,16 @@ router.post('/apiary', (req, res) => {
     }else{
         apiary.createApiary(req.body.apiaryName, req.body.creationDate, sUser.UserNo, 
                 sUser.ID, function(result){
+            console.log(['post /apiary:', result]);
             if(result === 'SUCCESS'){
-                console.log(['post /apiary:', `Apiary added ${req.body.apiaryName}`]);
                 res.status(201).send({
                     isError: false, severity: 'Success', 
                     message: `Pasieka "${req.body.apiaryName}" dodana.`});
             }else if(result){
-                console.log(['post /apiary:', result]);
                 res.status(200).send({
                     isError: true, severity: 'Error', 
                     message: 'Pasieka o tej nazwie już istnieje.'});
             }else{
-                console.log(['post /apiary:', 'Failed to add apiary.']);
                 res.status(200).send({
                     isError: true, severity: 'Error', 
                         message: 'Nie można dodać pasieki.'});
@@ -99,8 +78,10 @@ router.post('/apiary', (req, res) => {
     }
 })
 
+// Add Group
 router.post('/group', (req, res) => {
     let sUser = req.session.user;
+    console.log(['post /group', req.body]);
 
     if(sUser == null || sUser == undefined){
         console.log(['post /group', 'User not authorized']);
@@ -108,13 +89,12 @@ router.post('/group', (req, res) => {
     }else{
         apiary.createGroup(req.body.apiaryID, req.body.groupName, req.body.creationDate, 
                 sUser.UserNo, function(result){
+            console.log(['post /group', result]);
             if(result === 'SUCCESS'){
-                console.log(['post /group', `Group added ${req.body.groupName}`]);
                 res.status(201).send({
                     isError: false, severity: 'Success', 
                     message: `Grupa "${req.body.groupName}" dodana do pasieki.`});
             }else if(result){
-                console.log(['post /group', result]);
                 let message = 'Coś poszło nie tak.';
 
                 if(result === 'APIARY_NOT_FOUND')
@@ -126,7 +106,6 @@ router.post('/group', (req, res) => {
                     isError: true, severity: 'Error', 
                     message: message});
             }else{
-                console.log(['post /group', 'Failed to add apiary.']);
                 res.status(200).send({
                     isError: true, severity: 'Error', message: 'Nie można dodać pasieki.'});
             }
@@ -134,8 +113,10 @@ router.post('/group', (req, res) => {
     }
 })
 
+// Add Hive
 router.post('/hive', (req, res) => {
     let sUser = req.session.user;
+    console.log(['post /hive', req.body]);
 
     if(sUser == null || sUser == undefined){
         console.log(['post /hive', 'User not authorized']);
@@ -143,13 +124,12 @@ router.post('/hive', (req, res) => {
     }else{
         apiary.createHive(req.body.apiaryID, req.body.groupID, req.body.hiveNum, 
                 req.body.creationDate, sUser.UserNo, function(result){
+            console.log(['post /hive', result]);
             if(result === 'SUCCESS'){
-                console.log(['post /hive', `Hive added ${req.body.groupName}`]);
                 res.status(201).send({
                     isError: false, severity: 'Success', 
                     message: `Ul "${req.body.hiveNum}" został dodany do pasieki.`});
             }else if(result){
-                console.log(['post /hive', result]);
                 let message = 'Coś poszło nie tak.';
 
                 if(result === 'APIARY_NOT_FOUND')
@@ -163,7 +143,6 @@ router.post('/hive', (req, res) => {
                     isError: true, severity: 'Error', 
                     message: message});
             }else{
-                console.log(['post /hive', 'Failed to add apiary.']);
                 res.status(200).send({
                     isError: true, severity: 'Error', message: 'Nie można dodać pasieki.'});
             }

@@ -18,19 +18,51 @@ router.get('/apiaries', (req, res) => {
     }
 })
 
-
-router.get('/hives', (req, res) => {
-    let apiaryID = req.body.apiaryID; 
-    let groupID = req.body.groupID; 
+// Get Hive groups
+router.post('/groups', (req, res) => {
+    let apiaryID = req.body.apiaryID;
+    let sUserID = req.session.user.ID;
     
-    if(apiaryID)
-        apiary.findUserHives(apiaryID, groupID, function(result){
+    if(apiaryID && apiaryID != ''){
+        apiary.findUserHiveGroups(parseInt(apiaryID), function(result){
             res.json(result);
         })
-    else{
-        res.json({})
+    }else{
+        apiary.findUserApiaries(sUserID, function(result){
+            if(result.length){
+                apiary.findUserHiveGroups(result[0].ID, function(result){
+                    res.json(result);
+                })
+            }else
+                res.json({})
+        })
     }
 })
+
+// Get Hives for group
+router.post('/hives', (req, res) => {
+    let apiaryID = req.body.apiaryID; 
+    let groupID = req.body.groupID; 
+    let sUserID = req.session.user.ID;
+    console.log(['Get /hives', apiaryID, groupID]);
+    
+    if(apiaryID && apiaryID != ''){
+        apiary.findUserHiveGroups(parseInt(apiaryID), function(result){
+            res.json(result);
+        })
+    }else{
+        apiary.findUserApiaries(sUserID, function(result){
+            if(result.length){
+                apiary.findUserHiveGroups(result[0].ID, function(result){
+                    res.json(result);
+                })
+            }else
+                res.json({})
+        })
+    }
+})
+
+
 
 
 module.exports = router;

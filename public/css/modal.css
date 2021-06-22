@@ -20,6 +20,7 @@
     margin: auto;
     padding: 0;
     border: 1px solid #888;
+    border-radius: 3px;
     width: 80%;
     min-width: 225px;
     max-width: 355px;
@@ -58,6 +59,7 @@
     cursor: pointer;
 }
 
+/* ---------------- Layout ---------------- */ 
 .modal-header {
     padding: 4px 8px;
     color: black;
@@ -72,11 +74,15 @@
     padding: 2px 4px 4px 4px;
     height: 45px;
     color: white;
-    border-top: gray 1px solid;
 }
 
 .modal-footer button {
     float: right;
+}
+
+.modal-content hr {
+    width: 95%;
+    margin: auto;
 }
 
 /* ---------------- Inputs ---------------- */
@@ -84,18 +90,21 @@
     padding-top: 6px;
     display: inline-block;
     width: 125px;
+    height: 21px;
 }
 
 .inputBox input{
     display: inline-block;
     width: 200px;
-    margin: 4px
+    margin: 4px;
+    height: 21px;
 }
 
 .inputBox select{
     display: inline-block;
     width: 204px;
     margin: 4px;
+    height: 25px;
 }
 
 /* ---------------- Other ---------------- */
