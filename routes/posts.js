@@ -107,7 +107,7 @@ router.post('/group', (req, res) => {
                     message: message});
             }else{
                 res.status(200).send({
-                    isError: true, severity: 'Error', message: 'Nie można dodać pasieki.'});
+                    isError: true, severity: 'Error', message: 'Nie można dodać grupy.'});
             }
         })
     }
@@ -144,7 +144,40 @@ router.post('/hive', (req, res) => {
                     message: message});
             }else{
                 res.status(200).send({
-                    isError: true, severity: 'Error', message: 'Nie można dodać pasieki.'});
+                    isError: true, severity: 'Error', message: 'Nie można dodać ula.'});
+            }
+        })
+    }
+})
+
+// Add Family
+router.post('/family', (req, res) => {
+    let sUser = req.session.user;
+    console.log(['post /family', req.body]);
+
+    if(sUser == null || sUser == undefined){
+        console.log(['post /family', 'User not authorized']);
+        res.status(401).send('Nie znaleziono użytkownika spróbuj przeładować stronę.');
+    }else{
+        apiary.createFamily(req.body.hiveID, req.body.creationDate, sUser.UserNo, 
+                function(result){
+            console.log(['post /family', result]);
+            if(result === 'SUCCESS'){
+                res.status(201).send({
+                    isError: false, severity: 'Success', 
+                    message: `Rodzina została dodana.`});
+            }else if(result){
+                let message = 'Coś poszło nie tak.';
+
+                if(result === 'HIVE_NOT_FOUND')
+                    message = 'Nie ma takiego Ula.';
+
+                res.status(200).send({
+                    isError: true, severity: 'Error', 
+                    message: message});
+            }else{
+                res.status(200).send({
+                    isError: true, severity: 'Error', message: 'Nie można dodać rodziny.'});
             }
         })
     }

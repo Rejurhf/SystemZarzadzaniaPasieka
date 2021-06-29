@@ -42,7 +42,8 @@ Apiary.prototype = {
                         JOIN apiary A
                             ON A.ID = UA.ApiaryID
                             AND A.Active = 1
-                    WHERE UA.UserID = ?`
+                    WHERE UA.UserID = ?
+                    ORDER BY A.Name`
 
         pool.query(sql, userID, function(err, result){
             if(err) throw err;
@@ -58,7 +59,8 @@ Apiary.prototype = {
         let sql = `SELECT HG.ID, HG.Name
                     FROM hive_group HG
                     WHERE HG.ApiaryID = ?
-                        AND HG.Active = 1`;
+                        AND HG.Active = 1
+                    ORDER BY HG.Name`;
 
         pool.query(sql, apiaryID, function(err, result){
             if(err) throw err;
@@ -71,14 +73,44 @@ Apiary.prototype = {
     },
 
     findUserHives: function(apiaryID, groupID, callback){
+        let inGroupID = groupID ? groupID : 0;
+
         let sql = `SELECT H.ID, H.Number
                     FROM hive H
                     WHERE H.ApiaryID = ?
                         AND ((H.GroupID IS NULL AND ? < 1)
                             OR H.GroupID = ?)
-                        AND H.Active = 1`
+                        AND H.Active = 1
+                    ORDER BY H.Number`
 
-        let bind = [apiaryID, groupID, groupID];
+        let bind = [apiaryID, inGroupID, inGroupID];
+
+        pool.query(sql, bind, function(err, result){
+            if(err) throw err;
+
+            if(result.length) {
+                callback(result);
+            }else
+                callback(null);
+        })
+    },
+
+    findFreeUserHives: function(apiaryID, groupID, callback){
+        let inGroupID = groupID ? groupID : 0;
+
+        let sql = `SELECT H.ID, H.Number
+                FROM hive H
+                    LEFT JOIN family F
+                        ON F.HiveID = H.ID
+                        AND F.Active
+                WHERE H.ApiaryID = ?
+                    AND ((H.GroupID IS NULL AND ? < 1)
+                        OR H.GroupID = ?)
+                    AND F.ID IS NULL
+                    AND H.Active = 1
+                ORDER BY H.Number`
+
+        let bind = [apiaryID, inGroupID, inGroupID];
 
         pool.query(sql, bind, function(err, result){
             if(err) throw err;
@@ -91,7 +123,9 @@ Apiary.prototype = {
     },
 
     findGroup: async function(apiaryID, groupItem, key){
-        let sql = `SELECT ID, Name FROM hive_group WHERE ApiaryID = ? AND ${key} = ?`;
+        let sql = `SELECT ID, Name 
+                FROM hive_group 
+                WHERE ApiaryID = ? AND ${key} = ?`;
 
         try {
             let result = await pool.query(sql, [apiaryID, groupItem]);
@@ -106,12 +140,30 @@ Apiary.prototype = {
     },
     
     findHive: async function(apiaryID, groupID, hiveNum){
-        let sql = `SELECT ID, Number FROM hive
-            WHERE ApiaryID = ? AND Number = ?
-                AND (GroupID = ? OR (? = '' AND GroupID IS NULL))`;
+        let sql = `SELECT ID, Number 
+                FROM hive
+                WHERE ApiaryID = ? AND Number = ?
+                    AND (GroupID = ? OR (? = '' AND GroupID IS NULL))`;
 
         try {
             let result = await pool.query(sql, [apiaryID, hiveNum, groupID, groupID]);
+            
+            if(result.length)
+                return result[0];
+        } catch (err){
+            throw new Error(err);
+        }
+
+        return;
+    },
+
+    findHive: async function(hiveID){
+        let sql = `SELECT ID, Number 
+                FROM hive
+                WHERE ID = ?`;
+
+        try {
+            let result = await pool.query(sql, [hiveID]);
             
             if(result.length)
                 return result[0];
@@ -126,11 +178,11 @@ Apiary.prototype = {
     createApiary: async function(name, creationDate, createdBy, userID, callback){
         let apiaryNo = name.replace(/\s/g, '');
         let sqlInsApr = `INSERT INTO apiary(Name, ApiaryNo, StartTime, 
-            CreatedBy, LastUpdatedBy, Active)
-            VALUES(?, ?, ?, ?, ?, 1)`;
+                            CreatedBy, LastUpdatedBy, Active)
+                        VALUES(?, ?, ?, ?, ?, 1)`;
         let sqlInsUsrApr = `INSERT INTO user_apiary(UserID, ApiaryID, 
-                CreatedBy, LastUpdatedBy, Active)
-            VALUES(?, ?, ?, ?, 1)`
+                            CreatedBy, LastUpdatedBy, Active)
+                        VALUES(?, ?, ?, ?, 1)`
         let bindApr = [name, apiaryNo, creationDate, createdBy, createdBy];
 
         try {
@@ -157,8 +209,8 @@ Apiary.prototype = {
 
     createGroup: async function(apiaryID, groupName, creationDate, createdBy, callback){
         let sql = `INSERT INTO hive_group(Name, ApiaryID, StartTime, 
-                CreatedBy, LastUpdatedBy, Active)
-            VALUES(?, ?, ?, ?, ?, 1)`;
+                    CreatedBy, LastUpdatedBy, Active)
+                VALUES(?, ?, ?, ?, ?, 1)`;
         let bind = [groupName, apiaryID, creationDate, createdBy, createdBy];
 
         try {
@@ -218,6 +270,30 @@ Apiary.prototype = {
                 if(err) throw err;
     
                 if(hive) {
+                    callback('SUCCESS');
+                }else
+                    callback(null);
+            });
+        } catch (err) {
+            callback(err);
+        }
+    },
+
+    createFamily: async function(hiveID, creationDate, createdBy, callback){
+        let sql = `INSERT INTO family(HiveID, StartTime, CreatedBy, LastUpdatedBy, Active)
+            VALUE(?, ?, ?, ?, 1)`;
+        let bind = [hiveID, creationDate, createdBy, createdBy];
+        
+        try{
+            let hiveFound = await this.findHive(hiveID);
+
+            if(!hiveFound)
+                throw 'HIVE_NOT_FOUND';
+            
+            pool.query(sql, bind, function(err, family){
+                if(err) throw err;
+
+                if(family) {
                     callback('SUCCESS');
                 }else
                     callback(null);

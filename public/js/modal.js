@@ -4,8 +4,6 @@ function loadAddApiary(){
     let modal = document.getElementById('modalAddApiary'); 
     modal.style.display = 'block';
     modal.querySelector('.creationDate input').value = dateToInputString(new Date());
-
-    apiariesDropdown(modal);
 }
 
 // Add Group -----------------------------------------------------------------------------
@@ -71,12 +69,9 @@ function validateModal(elem){
                 isValid = false;
                 e.classList.add('notValid');
             }
-            console.log([e.name, e.value]);
             dataDict[e.name] = e.value;
         }
     })
-
-    console.log(["validate", isValid]);
     
     if (isValid){
         submitForm(modal, dataDict);
@@ -111,6 +106,12 @@ function closeModal(elem){
     modal.parentElement.style.display = 'none';
     modal.querySelectorAll('input').forEach(e => {e.classList.remove('notValid')});
     modal.querySelectorAll('select').forEach(e => {e.classList.remove('notValid')});
+	if(modal.querySelector('.apiaryID select'))
+		modal.querySelector('.apiaryID select').value = null;
+	if(modal.querySelector('.groupID select'))
+		modal.querySelector('.groupID select').value = null;
+	if(modal.querySelector('.hiveID select'))
+		modal.querySelector('.hiveID select').value = null;
 }
 
 function createAlert(message, severity){
@@ -138,7 +139,7 @@ function apiariesDropdown(modal){
             type: 'GET',
             dataType: 'json',
             success: function(data){
-                if(data.length){
+                if(data && data.length){
                     select.innerHTML = '';
             
                     data.forEach(e => {
@@ -164,13 +165,13 @@ function groupsDropdown(modal){
         let apiaryID = modal.querySelector('.apiaryID select').value;
         let dataDict = {apiaryID: apiaryID};
 
-        $.ajax({
+        return $.ajax({
             url: '/groups',
             type: 'POST',
             dataType: 'json',
             data: dataDict,
             success: function(data){
-                if(data){
+                if(data && data.length){
                     select.innerHTML = '';
                     select.appendChild(document.createElement('option'));
     
@@ -206,16 +207,13 @@ function hivesDropdown(modal){
             dataType: 'json',
             data: dataDict,
             success: function(data){
-                if(data.length){
+                if(data && data.length){
                     select.innerHTML = '';
-
-                    if(data.length > 1)
-                        select.appendChild(document.createElement('option'));
     
                     data.forEach(e => {
                         let opt = document.createElement('option');
                         opt.value = e.ID;
-                        opt.innerHTML = e.Name;
+                        opt.innerHTML = e.Number;
                         select.appendChild(opt);
                     });
                 }
@@ -230,6 +228,8 @@ function hivesDropdown(modal){
 // On Changes ----------------------------------------------------------------------------
 function onChangeApiary(elem){
     let modal = $(elem).closest('.modal')[0];
+    if(modal.querySelector('.groupID select'))
+		modal.querySelector('.groupID select').value = null;
     
     groupsDropdown(modal);
     hivesDropdown(modal);
