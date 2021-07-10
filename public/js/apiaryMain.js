@@ -11,6 +11,56 @@ window.onload = function() {
             success: function(data){
                 if(data && data.length){
 					console.log(['POST /hivelist', data]);
+
+                    for(let apiary of data){
+                        let apiaryContainer = document.createElement('div');
+                        let apiaryHeader = document.createElement('div');
+                        let apiaryHeaderText = document.createElement('p');
+                        let apiaryContent = document.createElement('div');
+
+                        apiaryContainer.classList.add('apiary-container');
+                        apiaryHeader.classList.add('apiary-header');
+                        apiaryContent.classList.add('apiary-content');
+
+                        apiaryHeaderText.innerHTML = apiary['ApiaryName']; 
+                        apiaryHeader.appendChild(apiaryHeaderText);
+
+                        for(let group of apiary['GroupList']){
+                            let groupContainer = document.createElement('div');
+                            let groupHeader = document.createElement('div');
+                            let groupHeaderText = document.createElement('p');
+                            let groupContent = document.createElement('div');
+                            
+                            groupContainer.classList.add('group-container');
+                            groupHeader.classList.add('group-header');
+                            groupContent.classList.add('group-content');
+
+                            groupHeaderText.innerHTML = group['GroupName']; 
+                            groupHeader.appendChild(groupHeaderText);
+
+                            for(let hive of group['HiveList']){
+                                let hiveElem = document.createElement('div');
+                                let hiveText = document.createElement('p');
+
+                                hiveElem.classList.add('hive-elem');
+
+                                hiveText.innerHTML = hive['HiveNum'];
+                                hiveElem.appendChild(hiveText);
+
+                                groupContent.appendChild(hiveElem);
+                            }
+
+                            groupContainer.appendChild(groupHeader);
+                            groupContainer.appendChild(groupContent);
+
+                            apiaryContent.appendChild(groupContainer);
+                        }
+
+                        apiaryContainer.appendChild(apiaryHeader);
+                        apiaryContainer.appendChild(apiaryContent);
+
+                        select.appendChild(apiaryContainer);
+                    }
                 }
             },
             error: function( jqXhr, textStatus, errorThrown ){

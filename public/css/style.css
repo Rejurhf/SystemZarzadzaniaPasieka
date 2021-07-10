@@ -141,7 +141,8 @@ button:hover{
 }
 
 #dashboard{
-    height: 100%;
+    height: calc(100% - 60px);
+    overflow: scroll;
     padding: 20px;
     border: 1px solid #ccc;
     background-color: #fff;
