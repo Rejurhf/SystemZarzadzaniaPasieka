@@ -35,3 +35,6 @@
 	margin: 2px;
 }
 
+.apiary-container .occupied{
+	background-color: green;
+}

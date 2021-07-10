@@ -1,6 +1,6 @@
 
 window.onload = function() {
-	let select = document.querySelector('#dashboard .apiary-container');
+	let select = document.querySelector('#dashboard .apiary-main');
 
 	// Get hive list
     if(select){
@@ -10,9 +10,7 @@ window.onload = function() {
             dataType: 'json',
             success: function(data){
                 if(data && data.length){
-                    // select.innerHTML = data;
-            
-					console.log([data]);
+					console.log(['POST /hivelist', data]);
                 }
             },
             error: function( jqXhr, textStatus, errorThrown ){

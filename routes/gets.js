@@ -73,13 +73,14 @@ router.post('/hivelist', (req, res) => {
     
     if(sUserID)
         apiary.getHiveList(sUserID, function(result){
-            res.json(result);
+            res.json(apiary.formatHiveListToJSON(result));
         })
     else{
         res.json({});
     }
 })
 
+// Helper functions
 
 
 

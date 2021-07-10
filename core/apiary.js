@@ -3,7 +3,104 @@ const pool = require('./pool');
 function Apiary(){};
 
 Apiary.prototype = {
-    // Get all Apiaries TODO: Get all Apiaries available for user
+    // Helper functions ------------------------------------------------------------------
+    formatHiveListToJSON: function(data){
+        if(data && data.length){
+            // Apiary array to JSON
+            let curApiaryID = data[0]['ApiaryID'];
+            let curGroupID = data[0]['GroupID'];
+            let apiaryList = [];
+            let groupList = [];
+            let hiveList = [];
+            for(let i = 0; i < data.length; ++i){
+                curItem = data[i];
+                if(curItem["ApiaryID"] === curApiaryID){
+                    if(curItem['GroupID'] === curGroupID){
+                        // Create new Hive and add to list
+                        let hive = {
+                            'HiveID': curItem['HiveID'],
+                            'HiveNum': curItem['HiveNum'],
+                            'FamilyID': curItem['FamilyID']
+                        }
+                        hiveList.push(hive);
+                    }else{
+                        // Create new Group with Hives
+                        prevItem = data[i-1];
+                        let groupDict = {
+                            'GroupID': prevItem['GroupID'],
+                            'GroupName': prevItem['GroupName'],
+                            'HiveList': hiveList
+                        }
+                        groupList.push(groupDict);
+
+                        // Empty Hive list and add new Hive to empty List
+                        hiveList = [];
+                        let hive = {
+                            'HiveID': curItem['HiveID'],
+                            'HiveNum': curItem['HiveNum'],
+                            'FamilyID': curItem['FamilyID']
+                        }
+                        hiveList.push(hive);
+
+                        // Update cur values
+                        curGroupID = curItem['GroupID'];
+                    }
+                }else{
+                    prevItem = data[i-1];
+                    // Create new Group with Hives
+                    let groupDict = {
+                        'GroupID': prevItem['GroupID'],
+                        'GroupName': prevItem['GroupName'],
+                        'HiveList': hiveList
+                    }
+                    groupList.push(groupDict);
+
+                    // Create new Apiary with Groups
+                    let apiaryDict = {
+                        'ApiaryID': prevItem['ApiaryID'],
+                        'ApiaryName': prevItem['ApiaryName'],
+                        'GroupList': groupList
+                    }
+                    apiaryList.push(apiaryDict);
+
+                    //Empty Group and Hive list and add new Hive to empty List
+                    groupList = [];
+                    hiveList = [];
+                    let hive = {
+                        'HiveID': curItem['HiveID'],
+                        'HiveNum': curItem['HiveNum'],
+                        'FamilyID': curItem['FamilyID']
+                    }
+                    hiveList.push(hive);
+
+                    // Update cur values
+                    curApiaryID = curItem['ApiaryID'];
+                    curGroupID = curItem['GroupID'];
+                }
+            }
+            // Finishapiaries after loop
+            lastItem = data[data.length - 1];
+            // Create new Group with Hives
+            let groupDict = {
+                'GroupID': lastItem['GroupID'],
+                'GroupName': lastItem['GroupName'],
+                'HiveList': hiveList
+            }
+            groupList.push(groupDict);
+
+            // Create new Apiary with Groups
+            let apiaryDict = {
+                'ApiaryID': lastItem['ApiaryID'],
+                'ApiaryName': lastItem['ApiaryName'],
+                'GroupList': groupList
+            }
+            apiaryList.push(apiaryDict);
+
+            console.log(['POST /hivelist', apiaryList]);
+            return(apiaryList);
+        }
+    },
+
     // Get -------------------------------------------------------------------------------
     getApiaries: function(callback){
         let sql = `SELECT Name FROM apiary WHERE Active = 1`;
@@ -109,13 +206,19 @@ Apiary.prototype = {
     getHiveList: function(userID, callback){
         let sql = `SELECT
                     H.ApiaryName
+                    ,H.ApiaryID
                     ,H.GroupName
+                    ,H.GroupID
                     ,H.HiveNum
+                    ,H.HiveID
                     ,H.FamilyID
                 FROM (SELECT 
                         A.Name 		AS ApiaryName
+                        ,A.ID       AS ApiaryID
                         ,HG.Name 	AS GroupName
+                        ,HG.ID      AS GroupID
                         ,H.Number 	AS HiveNum
+                        ,H.ID       AS HiveID
                         ,F.ID 		AS FamilyID
                         ,F.Active 	AS Active
                     FROM user_apiary UA
@@ -137,8 +240,11 @@ Apiary.prototype = {
                     UNION 
                     SELECT 
                         A.Name 		AS ApiaryName
+                        ,A.ID       AS ApiaryID
                         ,NULL 		AS GroupName
+                        ,NULL       AS GroupID
                         ,H.Number 	AS HiveNum
+                        ,H.ID       AS HiveID
                         ,F.ID 		AS FamilyID
                         ,F.Active 	AS Active
                     FROM user_apiary UA
@@ -363,6 +469,8 @@ Apiary.prototype = {
             callback(err);
         }
     }
+
+    
 }
 
 module.exports = Apiary;
