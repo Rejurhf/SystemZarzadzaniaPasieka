@@ -1,0 +1,37 @@
+
+.apiary-container{
+	background-color: gray;
+	margin: 2px;
+	padding: 2px;
+}
+
+.apiary-container .apiary-header{
+	color: white;
+}
+
+.apiary-container .apiary-content{
+	display: flex;
+    flex-flow: row wrap;
+}
+
+.apiary-container .group-container{
+	background-color: gainsboro;
+	padding: 2px;
+	border: 1px solid black;
+	margin: 2px;
+}
+
+.apiary-container .group-container .group-content{
+	display: flex;
+    flex-flow: row wrap;
+}
+
+.apiary-container .hive-elem {
+	height: 100px;
+	width: 200px;
+	background-color: darkgray;
+	color: white;
+	border: 1px solid black;
+	margin: 2px;
+}
+

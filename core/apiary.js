@@ -20,23 +20,7 @@ Apiary.prototype = {
         });
     },
 
-    // Find ------------------------------------------------------------------------------
-    findApiary: async function(apiary = null, key){
-        let sql = `SELECT ID, Name FROM apiary WHERE ${key} = ?`;
-
-        try {
-            let result = await pool.query(sql, apiary);
-
-            if(result.length)
-                return result[0];
-        } catch (err){
-            throw new Error(err);
-        }
-
-        return;
-    },
-
-    findUserApiaries: function(userID, callback){
+    getUserApiaries: function(userID, callback){
         let sql = `SELECT A.ID, A.Name
                     FROM user_apiary UA
                         JOIN apiary A
@@ -52,10 +36,10 @@ Apiary.prototype = {
                 callback(result);
             }else
                 callback(null);
-        })
+        });
     },
 
-    findUserHiveGroups: function(apiaryID, callback){
+    getUserHiveGroups: function(apiaryID, callback){
         let sql = `SELECT HG.ID, HG.Name
                     FROM hive_group HG
                     WHERE HG.ApiaryID = ?
@@ -72,7 +56,7 @@ Apiary.prototype = {
         })
     },
 
-    findUserHives: function(apiaryID, groupID, callback){
+    getUserHives: function(apiaryID, groupID, callback){
         let inGroupID = groupID ? groupID : 0;
 
         let sql = `SELECT H.ID, H.Number
@@ -95,7 +79,7 @@ Apiary.prototype = {
         })
     },
 
-    findFreeUserHives: function(apiaryID, groupID, callback){
+    getFreeUserHives: function(apiaryID, groupID, callback){
         let inGroupID = groupID ? groupID : 0;
 
         let sql = `SELECT H.ID, H.Number
@@ -120,6 +104,83 @@ Apiary.prototype = {
             }else
                 callback(null);
         })
+    },
+
+    getHiveList: function(userID, callback){
+        let sql = `SELECT
+                    H.ApiaryName
+                    ,H.GroupName
+                    ,H.HiveNum
+                    ,H.FamilyID
+                FROM (SELECT 
+                        A.Name 		AS ApiaryName
+                        ,HG.Name 	AS GroupName
+                        ,H.Number 	AS HiveNum
+                        ,F.ID 		AS FamilyID
+                        ,F.Active 	AS Active
+                    FROM user_apiary UA
+                        JOIN apiary A
+                            ON A.ID = UA.ApiaryID
+                            AND A.Active = 1
+                        JOIN hive_group HG
+                            ON HG.ApiaryID = A.ID
+                            AND HG.Active = 1
+                        JOIN hive H
+                            ON H.ApiaryID = A.ID
+                            AND H.GroupID IS NOT NULL 
+                            AND H.GroupID = HG.ID
+                            AND H.Active = 1
+                        LEFT JOIN family F
+                            ON F.HiveID = H.ID
+                            AND F.Active = 1
+                    WHERE UA.UserID = ?
+                    UNION 
+                    SELECT 
+                        A.Name 		AS ApiaryName
+                        ,NULL 		AS GroupName
+                        ,H.Number 	AS HiveNum
+                        ,F.ID 		AS FamilyID
+                        ,F.Active 	AS Active
+                    FROM user_apiary UA
+                        JOIN apiary A
+                            ON A.ID = UA.ApiaryID
+                            AND A.Active = 1
+                        JOIN hive H
+                            ON H.ApiaryID = A.ID
+                            AND H.GroupID IS NULL 
+                            AND H.Active = 1
+                        LEFT JOIN family F
+                            ON F.HiveID = H.ID
+                            AND F.Active = 1
+                    WHERE UA.UserID = ?
+                ) H
+                ORDER BY H.ApiaryName, ISNULL(H.GroupName), 
+                    H.GroupName, H.HiveNum`
+
+        pool.query(sql, [userID, userID], function(err, result){
+            if(err) throw err;
+
+            if(result.length) {
+                callback(result);
+            }else
+                callback(null);
+        })
+    },
+
+    // Find ------------------------------------------------------------------------------
+    findApiary: async function(apiary = null, key){
+        let sql = `SELECT ID, Name FROM apiary WHERE ${key} = ?`;
+
+        try {
+            let result = await pool.query(sql, apiary);
+
+            if(result.length)
+                return result[0];
+        } catch (err){
+            throw new Error(err);
+        }
+
+        return;
     },
 
     findGroup: async function(apiaryID, groupItem, key){

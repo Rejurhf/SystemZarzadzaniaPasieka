@@ -10,11 +10,11 @@ router.get('/apiaries', (req, res) => {
     let sUserID = req.session.user.ID; 
     
     if(sUserID)
-        apiary.findUserApiaries(sUserID, function(result){
+        apiary.getUserApiaries(sUserID, function(result){
             res.json(result);
         })
     else{
-        res.json({})
+        res.json({});
     }
 })
 
@@ -25,13 +25,13 @@ router.post('/groups', (req, res) => {
     console.log(['GET /groups', req.body]);
     
     if(apiaryID && apiaryID != ''){
-        apiary.findUserHiveGroups(parseInt(apiaryID), function(result){
+        apiary.getUserHiveGroups(parseInt(apiaryID), function(result){
             res.json(result);
         })
     }else{
-        apiary.findUserApiaries(sUserID, function(result){
+        apiary.getUserApiaries(sUserID, function(result){
             if(result && result.length){
-                apiary.findUserHiveGroups(result[0].ID, function(result){
+                apiary.getUserHiveGroups(result[0].ID, function(result){
                     res.json(result);
                 })
             }else
@@ -45,10 +45,10 @@ router.post('/hives', (req, res) => {
     let apiaryID = req.body.apiaryID; 
     let groupID = req.body.groupID; 
     let sUserID = req.session.user.ID;
-    console.log(['Get /hives', apiaryID, groupID]);
+    console.log(['GET /hives', apiaryID, groupID]);
     
     if(apiaryID && apiaryID != ''){
-        apiary.findFreeUserHives(parseInt(apiaryID), parseInt(groupID), function(result){
+        apiary.getFreeUserHives(parseInt(apiaryID), parseInt(groupID), function(result){
             console.log(['Get /hives', result]);
             if(result)
                 res.json(result);
@@ -56,14 +56,27 @@ router.post('/hives', (req, res) => {
                 res.json({});
         })
     }else{
-        apiary.findUserApiaries(sUserID, function(result){
+        apiary.getUserApiaries(sUserID, function(result){
             if(result.length){
-                apiary.findFreeUserHives(result[0].ID, parseInt(groupID), function(result){
+                apiary.getFreeUserHives(result[0].ID, parseInt(groupID), function(result){
                     res.json(result);
                 })
             }else
                 res.json({});
         })
+    }
+})
+
+// Get Hive list with families, aroups and apiaries
+router.post('/hivelist', (req, res) => {
+    let sUserID = req.session.user.ID; 
+    
+    if(sUserID)
+        apiary.getHiveList(sUserID, function(result){
+            res.json(result);
+        })
+    else{
+        res.json({});
     }
 })
 

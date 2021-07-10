@@ -140,7 +140,7 @@ button:hover{
     padding: 10px 15px;
 }
 
-.dashboard{
+#dashboard{
     height: 100%;
     padding: 20px;
     border: 1px solid #ccc;
