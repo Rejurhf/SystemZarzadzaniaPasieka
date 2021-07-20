@@ -43,17 +43,31 @@ window.onload = function() {
                                 let hiveText = document.createElement('p');
 
                                 hiveElem.classList.add('hive-elem');
+                                if(hive['FamilyID']){
+                                    hiveElem.classList.add('occupied');
+                                }
 
                                 hiveText.innerHTML = hive['HiveNum'];
                                 hiveElem.appendChild(hiveText);
+                                hiveElem.setAttribute('value', hive['HiveID']);
+                                hiveElem.onclick = function(){
+                                    hiveOnClick(hive['HiveID'])
+                                };
 
-                                groupContent.appendChild(hiveElem);
+                                if(group['GroupID']){
+                                    groupContent.appendChild(hiveElem);
+                                }else{
+                                    apiaryContent.appendChild(hiveElem);
+                                }
+                                
                             }
 
-                            groupContainer.appendChild(groupHeader);
-                            groupContainer.appendChild(groupContent);
+                            if(group['GroupID']){
+                                groupContainer.appendChild(groupHeader);
+                                groupContainer.appendChild(groupContent);
 
-                            apiaryContent.appendChild(groupContainer);
+                                apiaryContent.appendChild(groupContainer);
+                            }
                         }
 
                         apiaryContainer.appendChild(apiaryHeader);
@@ -68,4 +82,12 @@ window.onload = function() {
             }
         })
     }
-  };
+};
+
+function hiveOnClick(hiveID){
+    console.log(hiveID);
+    let urlStr = '/apiary/hive/' + hiveID;
+    window.location = urlStr;
+}
+
+
