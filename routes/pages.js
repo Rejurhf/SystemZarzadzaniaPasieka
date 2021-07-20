@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 
-// Login ----------------------------------------------------------------
+// Login ---------------------------------------------------------------------------------
 // Get index page
 router.get('/', (req, res, next) => {
     let user = req.session.user;
@@ -27,7 +27,7 @@ router.get('/loggout', (req, res, next) => {
     }
 });
 
-// Home ----------------------------------------------------------------
+// Home ----------------------------------------------------------------------------------
 // Get Home page 
 router.get('/home', (req, res, next) => {
     let user = req.session.user;
@@ -39,7 +39,7 @@ router.get('/home', (req, res, next) => {
     res.redirect('/');
 })
 
-// Apiary ----------------------------------------------------------------
+// Apiary --------------------------------------------------------------------------------
 // Get Apiary page 
 router.get('/apiary', (req, res, next) => {
     let user = req.session.user;
@@ -51,7 +51,19 @@ router.get('/apiary', (req, res, next) => {
     res.redirect('/');
 })
 
-// Actions ----------------------------------------------------------------
+// Go to Hive page
+router.get('/apiary/hive/:hiveId', (req, res, next) => {
+    let user = req.session.user;
+    console.log(req.params.hiveId);
+
+    if(user){
+        res.render('apiary/hive', {name:user.FirstName, hiveID:req.params.hiveId});
+        return;
+    }
+    res.redirect('/');
+})
+
+// Actions -------------------------------------------------------------------------------
 // Get Actions page 
 router.get('/actions', (req, res, next) => {
     let user = req.session.user;
@@ -63,7 +75,7 @@ router.get('/actions', (req, res, next) => {
     res.redirect('/');
 })
 
-// History ----------------------------------------------------------------
+// History -------------------------------------------------------------------------------
 // Get History page 
 router.get('/history', (req, res, next) => {
     let user = req.session.user;

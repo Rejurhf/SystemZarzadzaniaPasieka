@@ -2,8 +2,8 @@ extends ../layout
 include ../includes/header-links
 
 append styles 
-    link(rel="stylesheet" href="css/modal.css")
-    link(rel="stylesheet" href="css/apiary-grid.css")
+    link(rel="stylesheet" href="/css/modal.css")
+    link(rel="stylesheet" href="/css/apiary-grid.css")
 
 append scripts 
     script(src='js/modal.js')
@@ -23,48 +23,7 @@ block content
             button(onclick="loadAddHive()") Dodaj Ul 
             button(onclick="loadAddFamily()") Dodaj Rodzinę
         .apiary-main
-            .apiary-container
-                .apiary-header
-                    p apiary 1
-                .apiary-content
-                    .group-container
-                        .group-header
-                            p group 11
-                        .group-content
-                            .hive-elem.occupied
-                                p ul 111
-                            .hive-elem 
-                                p ul 112
-                    .hive-elem 
-                        p ul 101
-            .apiary-container
-                .apiary-header
-                    p apiary 1
-                .apiary-content
-                    .group-container
-                        .group-header
-                            p group 21
-                        .group-content
-                            .hive-elem.occupied
-                                p ul 211
-                            .hive-elem.occupied
-                                p ul 212
-                    .group-container
-                        .group-header
-                            p group 22
-                        .group-content
-                            .hive-elem.occupied
-                                p ul 221
-                            .hive-elem 
-                                p ul 222
-                            .hive-elem 
-                                p ul 223
-                    .hive-elem 
-                        p ul 201
-                    .hive-elem.occupied
-                        p ul 202
-                    .hive-elem 
-                        p ul 203
+            
 
     .modal-container
         include ../modals/add-apiary-modal

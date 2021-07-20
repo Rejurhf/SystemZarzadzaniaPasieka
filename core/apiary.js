@@ -96,7 +96,6 @@ Apiary.prototype = {
             }
             apiaryList.push(apiaryDict);
 
-            console.log(['POST /hivelist', apiaryList]);
             return(apiaryList);
         }
     },
