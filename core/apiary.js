@@ -17,12 +17,14 @@ Apiary.prototype = {
                 if(curItem["ApiaryID"] === curApiaryID){
                     if(curItem['GroupID'] === curGroupID){
                         // Create new Hive and add to list
-                        let hive = {
-                            'HiveID': curItem['HiveID'],
-                            'HiveNum': curItem['HiveNum'],
-                            'FamilyID': curItem['FamilyID']
+                        if(curItem['HiveID']){
+                            let hive = {
+                                'HiveID': curItem['HiveID'],
+                                'HiveNum': curItem['HiveNum'],
+                                'FamilyID': curItem['FamilyID']
+                            }
+                            hiveList.push(hive);
                         }
-                        hiveList.push(hive);
                     }else{
                         // Create new Group with Hives
                         prevItem = data[i-1];
@@ -66,12 +68,14 @@ Apiary.prototype = {
                     //Empty Group and Hive list and add new Hive to empty List
                     groupList = [];
                     hiveList = [];
-                    let hive = {
-                        'HiveID': curItem['HiveID'],
-                        'HiveNum': curItem['HiveNum'],
-                        'FamilyID': curItem['FamilyID']
+                    if(curItem['HiveID']){
+                        let hive = {
+                            'HiveID': curItem['HiveID'],
+                            'HiveNum': curItem['HiveNum'],
+                            'FamilyID': curItem['FamilyID']
+                        }
+                        hiveList.push(hive);
                     }
-                    hiveList.push(hive);
 
                     // Update cur values
                     curApiaryID = curItem['ApiaryID'];
@@ -221,13 +225,13 @@ Apiary.prototype = {
                         ,F.ID 		AS FamilyID
                         ,F.Active 	AS Active
                     FROM user_apiary UA
-                        JOIN apiary A
+                        LEFT JOIN apiary A
                             ON A.ID = UA.ApiaryID
                             AND A.Active = 1
-                        JOIN hive_group HG
+                        LEFT JOIN hive_group HG
                             ON HG.ApiaryID = A.ID
                             AND HG.Active = 1
-                        JOIN hive H
+                        LEFT JOIN hive H
                             ON H.ApiaryID = A.ID
                             AND H.GroupID IS NOT NULL 
                             AND H.GroupID = HG.ID
@@ -467,9 +471,30 @@ Apiary.prototype = {
         } catch (err) {
             callback(err);
         }
-    }
+    },
 
-    
+    // Delete ----------------------------------------------------------------------------
+    deleteHive: async function(hiveID, callback) {
+        let sqlDelFamily = `DELETE FROM family
+                            WHERE HiveID = ?`;
+        let sqlDelHive = `DELETE FROM hive
+                            WHERE ID = ?`;
+
+        try {
+            let resultFamily = await pool.query(sqlDelFamily, [hiveID]);
+            let resultHive = await pool.query(sqlDelHive, [hiveID]);
+
+            if(resultFamily.affectedRows == 1 && resultHive.affectedRows == 1){
+                callback('SUCCESS_HIVE_FAMILY');
+            }else if(resultHive.affectedRows == 1){
+                callback('SUCCESS_HIVE');
+            }else{
+                callback(null);
+            }
+        } catch (err) {
+            callback(err);
+        }
+    }
 }
 
 module.exports = Apiary;

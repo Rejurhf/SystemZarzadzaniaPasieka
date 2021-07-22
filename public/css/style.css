@@ -8,6 +8,7 @@
 html, body {
     background-color: #F0F0F0;
     height: 100%;
+    overflow: hidden;
 }
 
 body{
@@ -21,6 +22,8 @@ body{
     height: 100%;
     margin: 0 auto;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
 }
 
 /* ---------------- Nav ---------------- */
@@ -141,11 +144,11 @@ button:hover{
 }
 
 #dashboard{
-    height: calc(100% - 60px);
     overflow: auto;
     padding: 20px;
     border: 1px solid #ccc;
     background-color: #fff;
+    height: 100%;
 }
 
 .user-post-area{

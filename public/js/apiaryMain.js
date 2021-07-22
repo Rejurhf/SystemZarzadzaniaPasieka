@@ -10,9 +10,9 @@ window.onload = function() {
             dataType: 'json',
             success: function(data){
                 if(data && data.length){
-					console.log(['POST /hivelist', data]);
-
+                    // Create Apiary grid
                     for(let apiary of data){
+                        // Create Apiary
                         let apiaryContainer = document.createElement('div');
                         let apiaryHeader = document.createElement('div');
                         let apiaryHeaderText = document.createElement('p');
@@ -25,6 +25,7 @@ window.onload = function() {
                         apiaryHeaderText.innerHTML = apiary['ApiaryName']; 
                         apiaryHeader.appendChild(apiaryHeaderText);
 
+                        // Create Groups for Apiary
                         for(let group of apiary['GroupList']){
                             let groupContainer = document.createElement('div');
                             let groupHeader = document.createElement('div');
@@ -38,9 +39,11 @@ window.onload = function() {
                             groupHeaderText.innerHTML = group['GroupName']; 
                             groupHeader.appendChild(groupHeaderText);
 
+                            // Create Hives for group
                             for(let hive of group['HiveList']){
                                 let hiveElem = document.createElement('div');
                                 let hiveText = document.createElement('p');
+                                let hiveMenu = document.createElement('span');
 
                                 hiveElem.classList.add('hive-elem');
                                 if(hive['FamilyID']){
@@ -49,11 +52,22 @@ window.onload = function() {
 
                                 hiveText.innerHTML = hive['HiveNum'];
                                 hiveElem.appendChild(hiveText);
+                                
+                                // Add Hive menu
+                                hiveMenu.innerHTML = 'Usuń';
+                                hiveMenu.classList.add('hive-menu');
+                                hiveMenu.onclick = function(e){
+                                    hiveDeleteOnClick(e, hive['HiveID']);
+                                };
+                                hiveElem.appendChild(hiveMenu);
+
+                                // Add Hive tail on click
                                 hiveElem.setAttribute('value', hive['HiveID']);
                                 hiveElem.onclick = function(){
                                     hiveOnClick(hive['HiveID'])
                                 };
 
+                                // If no GroupID add hives without group
                                 if(group['GroupID']){
                                     groupContent.appendChild(hiveElem);
                                 }else{
@@ -89,5 +103,23 @@ function hiveOnClick(hiveID){
     let urlStr = '/apiary/hive/' + hiveID;
     window.location = urlStr;
 }
+
+function hiveDeleteOnClick(e, hiveID){
+    e.stopPropagation();
+    let urlStr = '/apiary/hive/' + hiveID 
+
+    $.ajax({
+        url: urlStr,
+        type: 'DELETE',
+        dataType: 'json',
+        success: function(data){
+            createAlert(data.message, data.severity);
+        },
+        error: function( jqXhr, textStatus, errorThrown ){
+            createAlert(jqXhr.responseText, 'Error');
+        }
+    })
+}
+
 
 

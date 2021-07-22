@@ -76,7 +76,7 @@ router.post('/apiary', (req, res) => {
             }
         })
     }
-})
+});
 
 // Add Group
 router.post('/group', (req, res) => {
@@ -111,7 +111,7 @@ router.post('/group', (req, res) => {
             }
         })
     }
-})
+});
 
 // Add Hive
 router.post('/hive', (req, res) => {
@@ -148,7 +148,7 @@ router.post('/hive', (req, res) => {
             }
         })
     }
-})
+});
 
 // Add Family
 router.post('/family', (req, res) => {
@@ -181,7 +181,7 @@ router.post('/family', (req, res) => {
             }
         })
     }
-})
+});
 
 
 

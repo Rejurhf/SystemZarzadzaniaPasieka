@@ -54,7 +54,7 @@ router.get('/apiary', (req, res, next) => {
 // Go to Hive page
 router.get('/apiary/hive/:hiveId', (req, res, next) => {
     let user = req.session.user;
-    console.log(req.params.hiveId);
+    console.log(['GET /apiary/hive/', req.params.hiveId]);
 
     if(user){
         res.render('apiary/hive', {name:user.FirstName, hiveID:req.params.hiveId});
