@@ -116,6 +116,8 @@ router.post('/group', (req, res) => {
 // Add Hive
 router.post('/hive', (req, res) => {
     let sUser = req.session.user;
+    let curDateTime = new Date();
+    console.log(curDateTime.toLocaleString(), '--------------------------------');
     console.log(['post /hive', req.body]);
 
     if(sUser == null || sUser == undefined){

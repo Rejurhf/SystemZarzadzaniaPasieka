@@ -88,6 +88,7 @@ function submitForm(modal, dataDict) {
         data: dataDict,
         success: function(data){
             createAlert(data.message, data.severity);
+            generateGridView();
             if(!data.isError){
                 closeModal(modal);
             }
@@ -207,7 +208,9 @@ function hivesDropdown(modal){
             dataType: 'json',
             data: dataDict,
             success: function(data){
+                console.log(data);
                 if(data && data.length){
+                    console.log('in');
                     select.innerHTML = '';
     
                     data.forEach(e => {
@@ -216,6 +219,8 @@ function hivesDropdown(modal){
                         opt.innerHTML = e.Number;
                         select.appendChild(opt);
                     });
+                }else{
+                    select.innerHTML = '';
                 }
             },
             error: function( jqXhr, textStatus, errorThrown ){

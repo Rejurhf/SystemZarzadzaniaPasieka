@@ -1,6 +1,11 @@
 
 window.onload = function() {
-	let select = document.querySelector('#dashboard .apiary-main');
+	generateGridView();
+};
+
+function generateGridView(){
+    let select = document.querySelector('#dashboard .apiary-main');
+    select.innerHTML = '';
 
 	// Get hive list
     if(select){
@@ -96,10 +101,9 @@ window.onload = function() {
             }
         })
     }
-};
+}
 
 function hiveOnClick(hiveID){
-    console.log(hiveID);
     let urlStr = '/apiary/hive/' + hiveID;
     window.location = urlStr;
 }
@@ -114,6 +118,7 @@ function hiveDeleteOnClick(e, hiveID){
         dataType: 'json',
         success: function(data){
             createAlert(data.message, data.severity);
+            generateGridView();
         },
         error: function( jqXhr, textStatus, errorThrown ){
             createAlert(jqXhr.responseText, 'Error');

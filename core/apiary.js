@@ -309,7 +309,8 @@ Apiary.prototype = {
         return;
     },
     
-    findHive: async function(apiaryID, groupID, hiveNum){
+    findHive3: async function(apiaryID, groupID, hiveNum){
+        console.log([apiaryID, groupID, hiveNum]);
         let sql = `SELECT ID, Number 
                 FROM hive
                 WHERE ApiaryID = ? AND Number = ?
@@ -327,7 +328,7 @@ Apiary.prototype = {
         return;
     },
 
-    findHive: async function(hiveID){
+    findHive1: async function(hiveID){
         let sql = `SELECT ID, Number 
                 FROM hive
                 WHERE ID = ?`;
@@ -425,7 +426,7 @@ Apiary.prototype = {
         try{
             let apiaryFound = this.findApiary(apiaryID, 'ID');
             let groupFound = this.findGroup(apiaryID, groupID, 'ID');
-            let hiveFound = this.findHive(apiaryID, groupID, hiveNum);
+            let hiveFound = this.findHive3(apiaryID, groupID, hiveNum);
             
             let result = await Promise.all([apiaryFound, groupFound, hiveFound]);
 
@@ -435,6 +436,7 @@ Apiary.prototype = {
                 throw 'GROUP_NOT_FOUND';
             if(result[2])
                 throw 'HIVE_ALREADY_EXISTS';
+            console.log(result);
             
             pool.query(sql, bind, function(err, hive){
                 if(err) throw err;
@@ -455,7 +457,7 @@ Apiary.prototype = {
         let bind = [hiveID, creationDate, createdBy, createdBy];
         
         try{
-            let hiveFound = await this.findHive(hiveID);
+            let hiveFound = await this.findHive1(hiveID);
 
             if(!hiveFound)
                 throw 'HIVE_NOT_FOUND';
@@ -474,6 +476,66 @@ Apiary.prototype = {
     },
 
     // Delete ----------------------------------------------------------------------------
+    deleteGroup: async function(apiaryID, callback) {
+        let sqlDelFamily = `DELETE FROM family
+                            WHERE HiveID IN (SELECT ID
+                                FROM hive
+                                WHERE ApiaryID = ?)`
+        let sqlDelHive = `DELETE FROM hive
+                            WHERE ApiaryID = ?`;
+        let sqlDelGroup = `DELETE FROM hive_group
+                            WHERE ApiaryID = ?`;
+        let sqlDelApiary = `DELETE FROM apiary
+                            WHERE ID = ?`;
+
+        try {
+            let resultFamily = await pool.query(sqlDelFamily, [apiaryID]);
+            let resultHive = await pool.query(sqlDelHive, [apiaryID]);
+            let resultGroup = await pool.query(sqlDelGroup, [apiaryID]);
+            let resultApiary = await pool.query(sqlDelApiary, [apiaryID]);
+
+            if(resultApiary.affectedRows == 1 && resultHive.affectedRows >= 1){
+                callback('SUCCESS_APIARY_HIVE');
+            }else if(resultApiary.affectedRows == 1){
+                callback('SUCCESS_APIARY');
+            }else{
+                callback(null);
+            }
+        } catch (err) {
+            callback(err);
+        }
+    },
+
+    deleteGroup: async function(groupID, callback) {
+        let sqlDelFamily = `DELETE FROM family
+                            WHERE HiveID IN (SELECT ID
+                                FROM hive
+                                WHERE GroupID = ?)`
+        let sqlDelHive = `DELETE FROM hive
+                            WHERE GroupID = ?`;
+        let sqlDelGroup = `DELETE FROM hive_group
+                            WHERE ID = ?`;
+
+        try {
+            let resultFamily = await pool.query(sqlDelFamily, [groupID]);
+            let resultHive = await pool.query(sqlDelHive, [groupID]);
+            let resultGroup = await pool.query(sqlDelGroup, [groupID]);
+
+            if(resultGroup.affectedRows == 1 && resultHive.affectedRows >= 1 && 
+                    resultFamily.affectedRows >= 1){
+                callback('SUCCESS_GROUP_HIVE_FAMILY');
+            }else if(resultGroup.affectedRows == 1 && resultHive.affectedRows >= 1){
+                callback('SUCCESS_GROUP_HIVE');
+            }else if(resultGroup.affectedRows == 1){
+                callback('SUCCESS_GROUP');
+            }else{
+                callback(null);
+            }
+        } catch (err) {
+            callback(err);
+        }
+    },
+    
     deleteHive: async function(hiveID, callback) {
         let sqlDelFamily = `DELETE FROM family
                             WHERE HiveID = ?`;
@@ -488,6 +550,23 @@ Apiary.prototype = {
                 callback('SUCCESS_HIVE_FAMILY');
             }else if(resultHive.affectedRows == 1){
                 callback('SUCCESS_HIVE');
+            }else{
+                callback(null);
+            }
+        } catch (err) {
+            callback(err);
+        }
+    },
+
+    deleteFamily: async function(familyID, callback) {
+        let sqlDelFamily = `DELETE FROM family
+                            WHERE ID = ?`;
+
+        try {
+            let resultFamily = await pool.query(sqlDelFamily, [familyID]);
+
+            if(resultFamily.affectedRows == 1){
+                callback('SUCCESS_FAMILY');
             }else{
                 callback(null);
             }

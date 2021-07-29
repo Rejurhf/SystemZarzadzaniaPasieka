@@ -45,11 +45,14 @@ router.post('/hives', (req, res) => {
     let apiaryID = req.body.apiaryID; 
     let groupID = req.body.groupID; 
     let sUserID = req.session.user.ID;
+    
+    let curDateTime = new Date();
+    console.log(curDateTime.toLocaleString(), '--------------------------------');
     console.log(['GET /hives', apiaryID, groupID]);
     
     if(apiaryID && apiaryID != ''){
         apiary.getFreeUserHives(parseInt(apiaryID), parseInt(groupID), function(result){
-            console.log(['Get /hives', result]);
+            console.log(['GET /hives', result]);
             if(result)
                 res.json(result);
             else
