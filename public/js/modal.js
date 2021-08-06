@@ -12,30 +12,37 @@ function loadAddGroup(dataDict){
     modal.style.display = 'block';
     modal.querySelector('.creationDate input').value = dateToInputString(new Date());
 
-    let apiaryID = dataDict ? parseInt(dataDict['apiaryID'], 10) : 0;
+    let apiaryID = dataDict ? dataDict['apiaryID'] : null;
 
     apiariesDropdown(modal, apiaryID);
 }
 
 // Add Hive ------------------------------------------------------------------------------
-function loadAddHive(){
+function loadAddHive(dataDict){
     let modal = document.getElementById('modalAddHive');
     modal.style.display = 'block';
     modal.querySelector('.creationDate input').value = dateToInputString(new Date());
 
-    apiariesDropdown(modal);
-    groupsDropdown(modal);
+    let apiaryID = dataDict ? dataDict['apiaryID'] : null;
+    let groupID = dataDict ? dataDict['groupID'] : null;
+
+    apiariesDropdown(modal, apiaryID);
+    groupsDropdown(modal, apiaryID, groupID);
 }
 
 // Add Family ----------------------------------------------------------------------------
-function loadAddFamily(){
+function loadAddFamily(dataDict){
     let modal = document.getElementById('modalAddFamily');
     modal.style.display = 'block';
     modal.querySelector('.creationDate input').value = dateToInputString(new Date());
         
-    apiariesDropdown(modal);
-    groupsDropdown(modal);
-    hivesDropdown(modal);
+    let apiaryID = dataDict ? dataDict['apiaryID'] : null;
+    let groupID = dataDict ? dataDict['groupID'] : null;
+    let hiveID = dataDict ? dataDict['hiveID'] : null;
+
+    apiariesDropdown(modal, apiaryID);
+    groupsDropdown(modal, apiaryID, groupID);
+    hivesDropdown(modal, apiaryID, groupID, hiveID);
 }
 
 // Helper functions ----------------------------------------------------------------------
@@ -134,6 +141,7 @@ function createAlert(message, severity){
 // Dropdowns -----------------------------------------------------------------------------
 function apiariesDropdown(modal, apiaryID){
     let select = modal.querySelector('.apiaryID select');
+    console.log(['apiary start', apiaryID]);
 
     // Get dropdown data
     if(select){
@@ -144,15 +152,19 @@ function apiariesDropdown(modal, apiaryID){
             success: function(data){
                 if(data && data.length){
                     select.innerHTML = '';
-            
+                    let disableFlag = false;
+
                     data.forEach(e => {
                         let opt = document.createElement('option');
                         opt.value = e.ID;
                         opt.innerHTML = e.Name;
-                        if(apiaryID === e.ID)
+                        if(parseInt(apiaryID, 10) === e.ID){
                             opt.selected = true;
+                            disableFlag = true;
+                        }
                         select.appendChild(opt);
                     })
+                    select.disabled = disableFlag;
                 }
             },
             error: function( jqXhr, textStatus, errorThrown ){
@@ -162,12 +174,14 @@ function apiariesDropdown(modal, apiaryID){
     }
 }
 
-function groupsDropdown(modal){
+function groupsDropdown(modal, apiaryIDParam, groupID){
     let select = modal.querySelector('.groupID select');
+    console.log(['group start', apiaryIDParam, groupID]);
 
     // Get dropdown data
     if(select){
-        let apiaryID = modal.querySelector('.apiaryID select').value;
+        let apiaryID = apiaryIDParam ? 
+            apiaryIDParam : modal.querySelector('.apiaryID select').value;
         let dataDict = {apiaryID: apiaryID};
 
         return $.ajax({
@@ -179,13 +193,20 @@ function groupsDropdown(modal){
                 if(data && data.length){
                     select.innerHTML = '';
                     select.appendChild(document.createElement('option'));
+                    let disableFlag = groupID === undefined ? true : false;
     
                     data.forEach(e => {
                         let opt = document.createElement('option');
                         opt.value = e.ID;
                         opt.innerHTML = e.Name;
+                        console.log([groupID, e.ID]);
+                        if(parseInt(groupID, 10) === e.ID){
+                            opt.selected = true;
+                            disableFlag = true;
+                        }
                         select.appendChild(opt);
-                    })      
+                    })   
+                    select.disabled = disableFlag;
                 }else{
                     select.innerHTML = '';
                 }
@@ -197,12 +218,14 @@ function groupsDropdown(modal){
     }
 }
 
-function hivesDropdown(modal){
+function hivesDropdown(modal, apiaryIDParam, groupIDParam, hiveID){
     let select = modal.querySelector('.hiveID select');
 
     if(select){
-        let apiaryID = modal.querySelector('.apiaryID select').value;
-        let groupID = modal.querySelector('.groupID select').value;
+        let apiaryID = apiaryIDParam ? 
+            apiaryIDParam : modal.querySelector('.apiaryID select').value;
+        let groupID = groupIDParam ? 
+            groupIDParam : modal.querySelector('.groupID select').value;
         let dataDict = {apiaryID: apiaryID, groupID: groupID};
 
         // Get dropdown data
@@ -212,17 +235,21 @@ function hivesDropdown(modal){
             dataType: 'json',
             data: dataDict,
             success: function(data){
-                console.log(data);
                 if(data && data.length){
-                    console.log('in');
                     select.innerHTML = '';
+                    let disableFlag = false;
     
                     data.forEach(e => {
                         let opt = document.createElement('option');
                         opt.value = e.ID;
                         opt.innerHTML = e.Number;
+                        if(parseInt(hiveID, 10) === e.ID){
+                            opt.selected = true;
+                            disableFlag = true;
+                        }
                         select.appendChild(opt);
                     });
+                    select.disabled = disableFlag;
                 }else{
                     select.innerHTML = '';
                 }

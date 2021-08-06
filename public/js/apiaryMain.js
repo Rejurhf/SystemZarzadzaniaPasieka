@@ -272,12 +272,12 @@ function loadAddGroupOnClick(e, dataDict){
 
 function loadAddHiveWrapper(e, dataDict){
     e.stopPropagation();
-    loadAddHive();
+    loadAddHive(dataDict);
 }
 
 function loadAddFamilyWrapper(e, dataDict){
     e.stopPropagation();
-    loadAddFamily();
+    loadAddFamily(dataDict);
 }
 
 
