@@ -11,7 +11,7 @@ router.delete('/apiary/:apiaryID', (req, res) => {
     console.log(['DELETE /apiary/', req.params.apiaryID]);
     
     if(sUserID)
-        apiary.deleteHive(req.params.apiaryID, function(result){
+        apiary.deleteApiary(req.params.apiaryID, function(result){
             if(result === 'SUCCESS_APIARY_HIVE'){
                 res.status(200).send({
                     isError: false, severity: 'Success', 
@@ -23,7 +23,7 @@ router.delete('/apiary/:apiaryID', (req, res) => {
             }else{
                 res.status(200).send({
                     isError: true, severity: 'Error', 
-                        message: 'Nie można usunąć tego ula.'});
+                        message: 'Nie można usunąć tej pasieki.'});
             }
         })
     else{
@@ -37,7 +37,7 @@ router.delete('/apiary/group/:groupID', (req, res) => {
     console.log(['DELETE /apiary/group/', req.params.groupID]);
     
     if(sUserID)
-        apiary.deleteHive(req.params.groupID, function(result){
+        apiary.deleteGroup(req.params.groupID, function(result){
             if(result === 'SUCCESS_GROUP_HIVE_FAMILY'){
                 res.status(200).send({
                     isError: false, severity: 'Success', 
@@ -93,11 +93,11 @@ router.delete('/apiary/family/:familyID', (req, res) => {
     console.log(['DELETE /apiary/family/', req.params.familyID]);
     
     if(sUserID)
-        apiary.deleteHive(req.params.familyID, function(result){
+        apiary.deleteFamily(req.params.familyID, function(result){
             if(result === 'SUCCESS_FAMILY'){
                 res.status(200).send({
                     isError: false, severity: 'Success', 
-                    message: `Rodzina została usunięta`});
+                    message: `Rodzina została usunięta.`});
             }else{
                 res.status(200).send({
                     isError: true, severity: 'Error', 

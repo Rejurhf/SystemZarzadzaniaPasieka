@@ -476,7 +476,7 @@ Apiary.prototype = {
     },
 
     // Delete ----------------------------------------------------------------------------
-    deleteGroup: async function(apiaryID, callback) {
+    deleteApiary: async function(apiaryID, callback) {
         let sqlDelFamily = `DELETE FROM family
                             WHERE HiveID IN (SELECT ID
                                 FROM hive
@@ -485,6 +485,8 @@ Apiary.prototype = {
                             WHERE ApiaryID = ?`;
         let sqlDelGroup = `DELETE FROM hive_group
                             WHERE ApiaryID = ?`;
+        let sqlDelUserApiary = `DELETE FROM user_apiary
+                            WHERE ApiaryID = ?`;
         let sqlDelApiary = `DELETE FROM apiary
                             WHERE ID = ?`;
 
@@ -492,6 +494,7 @@ Apiary.prototype = {
             let resultFamily = await pool.query(sqlDelFamily, [apiaryID]);
             let resultHive = await pool.query(sqlDelHive, [apiaryID]);
             let resultGroup = await pool.query(sqlDelGroup, [apiaryID]);
+            let resultUserApiary = await pool.query(sqlDelUserApiary, [apiaryID]);
             let resultApiary = await pool.query(sqlDelApiary, [apiaryID]);
 
             if(resultApiary.affectedRows == 1 && resultHive.affectedRows >= 1){

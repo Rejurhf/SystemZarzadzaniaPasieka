@@ -7,12 +7,14 @@ function loadAddApiary(){
 }
 
 // Add Group -----------------------------------------------------------------------------
-function loadAddGroup(){
+function loadAddGroup(dataDict){
     let modal = document.getElementById('modalAddGroup');
     modal.style.display = 'block';
     modal.querySelector('.creationDate input').value = dateToInputString(new Date());
 
-    apiariesDropdown(modal);
+    let apiaryID = dataDict ? parseInt(dataDict['apiaryID'], 10) : 0;
+
+    apiariesDropdown(modal, apiaryID);
 }
 
 // Add Hive ------------------------------------------------------------------------------
@@ -130,7 +132,7 @@ function createAlert(message, severity){
 }
 
 // Dropdowns -----------------------------------------------------------------------------
-function apiariesDropdown(modal){
+function apiariesDropdown(modal, apiaryID){
     let select = modal.querySelector('.apiaryID select');
 
     // Get dropdown data
@@ -147,6 +149,8 @@ function apiariesDropdown(modal){
                         let opt = document.createElement('option');
                         opt.value = e.ID;
                         opt.innerHTML = e.Name;
+                        if(apiaryID === e.ID)
+                            opt.selected = true;
                         select.appendChild(opt);
                     })
                 }
