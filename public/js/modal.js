@@ -43,11 +43,12 @@ function loadAddFamily(dataDict){
     apiariesDropdown(modal, apiaryID);
     groupsDropdown(modal, apiaryID, groupID);
     hivesDropdown(modal, apiaryID, groupID, hiveID);
+    familyAttributeDropdown(modal);
 }
 
 // Helper functions ----------------------------------------------------------------------
 // Return string date for datetime selector format "YYYY-mm-DDTHH:MM"
-function dateToInputString(date){
+function dateTimeToInputString(date){
     let z  = n =>  ('0' + n).slice(-2);
 
     return date.getFullYear() + '-' + 
@@ -55,6 +56,14 @@ function dateToInputString(date){
         z(date.getDate()) + 'T' +
         z(date.getHours()) + ':'  + 
         z(date.getMinutes()); 
+}
+
+function dateToInputString(date){
+    let z  = n =>  ('0' + n).slice(-2);
+
+    return date.getFullYear() + '-' + 
+        z(date.getMonth()+1) + '-' +
+        z(date.getDate()); 
 }
 
 function validateModal(elem){
@@ -192,7 +201,6 @@ function groupsDropdown(modal, apiaryIDParam, groupID){
                     select.innerHTML = '';
                     select.appendChild(document.createElement('option'));
                     let disableFlag = apiaryIDParam ? true : false;
-                    console.log([disableFlag, groupID]);
     
                     data.forEach(e => {
                         let opt = document.createElement('option');
@@ -250,6 +258,50 @@ function hivesDropdown(modal, apiaryIDParam, groupIDParam, hiveID){
                     select.disabled = disableFlag;
                 }else{
                     select.innerHTML = '';
+                }
+            },
+            error: function( jqXhr, textStatus, errorThrown ){
+                createAlert(jqXhr.responseText, 'Error');
+            }
+        })
+    }
+}
+
+function familyAttributeDropdown(modal){
+    let selectState = modal.querySelector('.state select');
+    let selectSize = modal.querySelector('.size select');
+    let selectOrigin = modal.querySelector('.origin select');
+
+    // Get dropdown data
+    if(selectState){
+        $.ajax({
+            url: '/familyattributes',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data){
+                if(data){
+                    selectState.innerHTML = '';
+                    selectSize.innerHTML = '';
+                    selectOrigin.innerHTML = '';
+
+                    data['state'].forEach(e => {
+                        let opt = document.createElement('option');
+                        opt.value = e.Attribute;
+                        opt.innerHTML = e.Description;
+                        selectState.appendChild(opt);
+                    }) 
+                    data['size'].forEach(e => {
+                        let opt = document.createElement('option');
+                        opt.value = e.Attribute;
+                        opt.innerHTML = e.Description;
+                        selectSize.appendChild(opt);
+                    }) 
+                    data['origin'].forEach(e => {
+                        let opt = document.createElement('option');
+                        opt.value = e.Attribute;
+                        opt.innerHTML = e.Description;
+                        selectOrigin.appendChild(opt);
+                    }) 
                 }
             },
             error: function( jqXhr, textStatus, errorThrown ){

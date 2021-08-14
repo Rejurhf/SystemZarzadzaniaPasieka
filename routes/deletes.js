@@ -1,14 +1,16 @@
 
 const express = require('express');
 const Apiary = require('../core/apiary');
+const apiary = new Apiary();
+const Logger = require('../core/logger');
+const logger = new Logger();
 const router = express.Router();
 
-const apiary = new Apiary();
 
 // Delete Apiary -------------------------------------------------------------------------
 router.delete('/apiary/:apiaryID', (req, res) => {
     let sUserID = req.session.user.ID; 
-    console.log(['DELETE /apiary/', req.params.apiaryID]);
+    logger.consoleLog(new Date(), ['DELETE /apiary/', req.params.apiaryID]);
     
     if(sUserID)
         apiary.deleteApiary(req.params.apiaryID, function(result){
@@ -27,14 +29,15 @@ router.delete('/apiary/:apiaryID', (req, res) => {
             }
         })
     else{
-        res.json({});
+        logger.consoleLog(new Date(), ['post /apiary:', 'User not authorized']);
+        res.status(401).send('Nie znaleziono użytkownika spróbuj przeładować stronę.');
     }
 });
 
 // Delete Group --------------------------------------------------------------------------
 router.delete('/apiary/group/:groupID', (req, res) => {
     let sUserID = req.session.user.ID; 
-    console.log(['DELETE /apiary/group/', req.params.groupID]);
+    logger.consoleLog(new Date(), ['DELETE /apiary/group/', req.params.groupID]);
     
     if(sUserID)
         apiary.deleteGroup(req.params.groupID, function(result){
@@ -57,14 +60,15 @@ router.delete('/apiary/group/:groupID', (req, res) => {
             }
         })
     else{
-        res.json({});
+        logger.consoleLog(new Date(), ['post /apiary:', 'User not authorized']);
+        res.status(401).send('Nie znaleziono użytkownika spróbuj przeładować stronę.');
     }
 });
 
 // Delete Hive ---------------------------------------------------------------------------
 router.delete('/apiary/hive/:hiveID', (req, res) => {
     let sUserID = req.session.user.ID; 
-    console.log(['DELETE /apiary/hive/', req.params.hiveID]);
+    logger.consoleLog(new Date(), ['DELETE /apiary/hive/', req.params.hiveID]);
     
     if(sUserID)
         apiary.deleteHive(req.params.hiveID, function(result){
@@ -83,14 +87,15 @@ router.delete('/apiary/hive/:hiveID', (req, res) => {
             }
         })
     else{
-        res.json({});
+        logger.consoleLog(new Date(), ['post /apiary:', 'User not authorized']);
+        res.status(401).send('Nie znaleziono użytkownika spróbuj przeładować stronę.');
     }
 });
 
 // Delete Family -------------------------------------------------------------------------
 router.delete('/apiary/family/:familyID', (req, res) => {
     let sUserID = req.session.user.ID; 
-    console.log(['DELETE /apiary/family/', req.params.familyID]);
+    logger.consoleLog(new Date(), ['DELETE /apiary/family/', req.params.familyID]);
     
     if(sUserID)
         apiary.deleteFamily(req.params.familyID, function(result){
@@ -105,7 +110,8 @@ router.delete('/apiary/family/:familyID', (req, res) => {
             }
         })
     else{
-        res.json({});
+        logger.consoleLog(new Date(), ['post /apiary:', 'User not authorized']);
+        res.status(401).send('Nie znaleziono użytkownika spróbuj przeładować stronę.');
     }
 });
 

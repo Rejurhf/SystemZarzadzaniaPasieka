@@ -97,6 +97,7 @@ button:hover{
 .alert {
     padding: 20px;
     margin-top: 2px;
+    opacity: 0.9;
 }
 
 .severity-Error{

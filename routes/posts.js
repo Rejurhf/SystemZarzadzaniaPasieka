@@ -1,11 +1,13 @@
 
 const express = require('express');
 const User = require('../core/user');
+const user = new User();
 const Apiary = require('../core/apiary');
+const apiary = new Apiary();
+const Logger = require('../core/logger');
+const logger = new Logger();
 const router = express.Router();
 
-const user = new User();
-const apiary = new Apiary();
 
 // Login posts ---------------------------------------------------------------------------
 // Post login data
@@ -43,7 +45,7 @@ router.post('/register', (req, res, next) => {
                 res.redirect('/home');
             })
         }else{
-            console.log(['post /register:', 'Error creating a new user...']);
+            logger.consoleLog(new Date(), ['post /register:', 'Error creating a new user...']);
         }
     })
 });
@@ -52,15 +54,15 @@ router.post('/register', (req, res, next) => {
 // Add Apiaary
 router.post('/apiary', (req, res) => {
     let sUser = req.session.user;
-    console.log(['post /apiary:', req.body]);
+    logger.consoleLog(new Date(), ['post /apiary:', req.body]);
 
     if(sUser == null || sUser == undefined){
-        console.log(['post /apiary:', 'User not authorized']);
+        logger.consoleLog(new Date(), ['post /apiary:', 'User not authorized']);
         res.status(401).send('Nie znaleziono użytkownika spróbuj przeładować stronę.');
     }else{
         apiary.createApiary(req.body.apiaryName, req.body.creationDate, sUser.UserNo, 
                 sUser.ID, function(result){
-            console.log(['post /apiary:', result]);
+            logger.consoleLog(new Date(), ['post /apiary:', result]);
             if(result === 'SUCCESS'){
                 res.status(201).send({
                     isError: false, severity: 'Success', 
@@ -81,15 +83,15 @@ router.post('/apiary', (req, res) => {
 // Add Group
 router.post('/group', (req, res) => {
     let sUser = req.session.user;
-    console.log(['post /group', req.body]);
+    logger.consoleLog(new Date(), ['post /group', req.body]);
 
     if(sUser == null || sUser == undefined){
-        console.log(['post /group', 'User not authorized']);
+        logger.consoleLog(new Date(), ['post /group', 'User not authorized']);
         res.status(401).send('Nie znaleziono użytkownika spróbuj przeładować stronę.');
     }else{
         apiary.createGroup(req.body.apiaryID, req.body.groupName, req.body.creationDate, 
                 sUser.UserNo, function(result){
-            console.log(['post /group', result]);
+            logger.consoleLog(new Date(), ['post /group', result]);
             if(result === 'SUCCESS'){
                 res.status(201).send({
                     isError: false, severity: 'Success', 
@@ -116,17 +118,15 @@ router.post('/group', (req, res) => {
 // Add Hive
 router.post('/hive', (req, res) => {
     let sUser = req.session.user;
-    let curDateTime = new Date();
-    console.log(curDateTime.toLocaleString(), '--------------------------------');
-    console.log(['post /hive', req.body]);
+    logger.consoleLog(new Date(), ['POST /hive', req.body]);
 
     if(sUser == null || sUser == undefined){
-        console.log(['post /hive', 'User not authorized']);
+        logger.consoleLog(new Date(), ['post /hive', 'User not authorized']);
         res.status(401).send('Nie znaleziono użytkownika spróbuj przeładować stronę.');
     }else{
         apiary.createHive(req.body.apiaryID, req.body.groupID, req.body.hiveNum, 
                 req.body.creationDate, sUser.UserNo, function(result){
-            console.log(['post /hive', result]);
+            logger.consoleLog(new Date(), ['post /hive', result]);
             if(result === 'SUCCESS'){
                 res.status(201).send({
                     isError: false, severity: 'Success', 
@@ -155,15 +155,15 @@ router.post('/hive', (req, res) => {
 // Add Family
 router.post('/family', (req, res) => {
     let sUser = req.session.user;
-    console.log(['post /family', req.body]);
+    logger.consoleLog(new Date(), ['POST /family', req.body]);
 
     if(sUser == null || sUser == undefined){
-        console.log(['post /family', 'User not authorized']);
+        logger.consoleLog(new Date(), ['post /family', 'User not authorized']);
         res.status(401).send('Nie znaleziono użytkownika spróbuj przeładować stronę.');
     }else{
-        apiary.createFamily(req.body.hiveID, req.body.creationDate, sUser.UserNo, 
+        apiary.createFamily(req.body, sUser.UserNo, 
                 function(result){
-            console.log(['post /family', result]);
+            logger.consoleLog(new Date(), ['post /family', result]);
             if(result === 'SUCCESS'){
                 res.status(201).send({
                     isError: false, severity: 'Success', 

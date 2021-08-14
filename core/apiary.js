@@ -1,4 +1,7 @@
+
 const pool = require('./pool');
+const Logger = require('../core/logger');
+const logger = new Logger();
 
 function Apiary(){};
 
@@ -240,6 +243,7 @@ Apiary.prototype = {
                             ON F.HiveID = H.ID
                             AND F.Active = 1
                     WHERE UA.UserID = ?
+                        AND UA.Active = 1
                     UNION 
                     SELECT 
                         A.Name 		AS ApiaryName
@@ -262,6 +266,7 @@ Apiary.prototype = {
                             ON F.HiveID = H.ID
                             AND F.Active = 1
                     WHERE UA.UserID = ?
+                        AND UA.Active = 1
                 ) H
                 ORDER BY H.ApiaryName, ISNULL(H.GroupName), 
                     H.GroupName, H.HiveNum`
@@ -276,9 +281,54 @@ Apiary.prototype = {
         })
     },
 
+    getFamilyAttributes: async function(attributeType){
+        let sql = `SELECT
+                    Attribute 
+                    ,Description
+                FROM attribute
+                WHERE AttributeType = ?;`
+
+        try {
+            let result = await pool.query(sql, attributeType);
+
+            if(result.length)
+                return result;
+        } catch (err){
+            throw new Error(err);
+        }
+
+        return;
+    },
+
+    getFamilyAttributesForPopup: async function(callback){
+        try{
+            let attributeState = this.getFamilyAttributes('STATE');
+            let attributeSize = this.getFamilyAttributes('SIZE');
+            let attributeOrigin = this.getFamilyAttributes('ORIGIN');
+            
+            let result = await Promise.all([attributeState, attributeSize, attributeOrigin]);
+            let resultDict = {state: result[0], size: result[1], origin: result[2]}
+
+            logger.consoleLog(new Date(), ['getFamilyAttributesForPopup', 
+                resultDict['state'], resultDict['size'], resultDict['origin']]);
+            
+            if(result.length) {
+                callback(resultDict);
+            }else
+                callback(null);
+        } catch (err) {
+            callback(err);
+        }
+    },
+
     // Find ------------------------------------------------------------------------------
-    findApiary: async function(apiary = null, key){
-        let sql = `SELECT ID, Name FROM apiary WHERE ${key} = ?`;
+    findActiveApiary: async function(apiary = null, key){
+        let sql = `SELECT 
+                    ID
+                    ,Name 
+                FROM apiary 
+                WHERE ${key} = ?
+                    AND Active = 1`;
 
         try {
             let result = await pool.query(sql, apiary);
@@ -292,10 +342,12 @@ Apiary.prototype = {
         return;
     },
 
-    findGroup: async function(apiaryID, groupItem, key){
+    findActiveGroup: async function(apiaryID, groupItem, key){
         let sql = `SELECT ID, Name 
                 FROM hive_group 
-                WHERE ApiaryID = ? AND ${key} = ?`;
+                WHERE ApiaryID = ? 
+                    AND ${key} = ?
+                    AND Active = 1`;
 
         try {
             let result = await pool.query(sql, [apiaryID, groupItem]);
@@ -309,12 +361,14 @@ Apiary.prototype = {
         return;
     },
     
-    findHive3: async function(apiaryID, groupID, hiveNum){
-        console.log([apiaryID, groupID, hiveNum]);
+    findActiveHive3: async function(apiaryID, groupID, hiveNum){
+        logger.consoleLog(new Date(), [apiaryID, groupID, hiveNum]);
         let sql = `SELECT ID, Number 
                 FROM hive
-                WHERE ApiaryID = ? AND Number = ?
-                    AND (GroupID = ? OR (? = '' AND GroupID IS NULL))`;
+                WHERE ApiaryID = ? 
+                    AND Number = ?
+                    AND (GroupID = ? OR (? = '' AND GroupID IS NULL))
+                    AND Active = 1`;
 
         try {
             let result = await pool.query(sql, [apiaryID, hiveNum, groupID, groupID]);
@@ -328,10 +382,11 @@ Apiary.prototype = {
         return;
     },
 
-    findHive1: async function(hiveID){
+    findActiveHive1: async function(hiveID){
         let sql = `SELECT ID, Number 
                 FROM hive
-                WHERE ID = ?`;
+                WHERE ID = ?
+                    AND Active = 1`;
 
         try {
             let result = await pool.query(sql, [hiveID]);
@@ -357,7 +412,7 @@ Apiary.prototype = {
         let bindApr = [name, apiaryNo, creationDate, createdBy, createdBy];
 
         try {
-            let apiaryFound = await this.findApiary(apiaryNo, 'ApiaryNo');
+            let apiaryFound = await this.findActiveApiary(apiaryNo, 'ApiaryNo');
             
             if(apiaryFound)
                 throw 'APIARY_ALREADY_EXISTS';
@@ -385,8 +440,8 @@ Apiary.prototype = {
         let bind = [groupName, apiaryID, creationDate, createdBy, createdBy];
 
         try {
-            let apiaryFound = this.findApiary(apiaryID, 'ID');
-            let groupFound = this.findGroup(apiaryID, groupName, 'Name');
+            let apiaryFound = this.findActiveApiary(apiaryID, 'ID');
+            let groupFound = this.findActiveGroup(apiaryID, groupName, 'Name');
 
             let result = await Promise.all([apiaryFound, groupFound]);
             
@@ -424,9 +479,9 @@ Apiary.prototype = {
         }
         
         try{
-            let apiaryFound = this.findApiary(apiaryID, 'ID');
-            let groupFound = this.findGroup(apiaryID, groupID, 'ID');
-            let hiveFound = this.findHive3(apiaryID, groupID, hiveNum);
+            let apiaryFound = this.findActiveApiary(apiaryID, 'ID');
+            let groupFound = this.findActiveGroup(apiaryID, groupID, 'ID');
+            let hiveFound = this.findActiveHive3(apiaryID, groupID, hiveNum);
             
             let result = await Promise.all([apiaryFound, groupFound, hiveFound]);
 
@@ -436,7 +491,7 @@ Apiary.prototype = {
                 throw 'GROUP_NOT_FOUND';
             if(result[2])
                 throw 'HIVE_ALREADY_EXISTS';
-            console.log(result);
+            logger.consoleLog(new Date(), result);
             
             pool.query(sql, bind, function(err, hive){
                 if(err) throw err;
@@ -451,25 +506,46 @@ Apiary.prototype = {
         }
     },
 
-    createFamily: async function(hiveID, creationDate, createdBy, callback){
-        let sql = `INSERT INTO family(HiveID, StartTime, CreatedBy, LastUpdatedBy, Active)
+    createFamily: async function(dataDict, createdBy, callback){
+        let sqlAddFamily = `INSERT INTO family(HiveID, StartTime, CreatedBy, LastUpdatedBy, Active)
             VALUE(?, ?, ?, ?, 1)`;
-        let bind = [hiveID, creationDate, createdBy, createdBy];
+        let sqlAddDetails = `INSERT INTO family_details(FamilyID, Origin, CreatedBy, LastUpdatedBy, Active)
+            VALUE(?, ?, ?, ?, 1)`;
+        let sqlAddHistory = `INSERT INTO family_history(FamilyID, TransactionTime, Attribute, CreatedBy, LastUpdatedBy, Active)
+            VALUE(?, ?, ?, ?, ?, 1)`;
+        let bind = [dataDict.hiveID, dataDict.creationDate, createdBy, createdBy];
         
         try{
-            let hiveFound = await this.findHive1(hiveID);
-
+            let hiveFound = await this.findActiveHive1(dataDict.hiveID);
             if(!hiveFound)
                 throw 'HIVE_NOT_FOUND';
             
-            pool.query(sql, bind, function(err, family){
-                if(err) throw err;
+            let resultFamily = await pool.query(sqlAddFamily, bind);
+            if(!resultFamily || resultFamily.affectedRows == 0)
+                throw 'FAILED_TO_ADD_FAMILY';
 
-                if(family) {
-                    callback('SUCCESS');
-                }else
-                    callback(null);
-            });
+            let resultDetails = await pool.query(sqlAddDetails, 
+                [resultFamily.insertId, dataDict.origin, createdBy, createdBy]);
+            if(!resultDetails || resultDetails.affectedRows == 0)
+                throw 'FAILED_TO_ADD_FAMILY';
+            
+            let resultState = await pool.query(sqlAddHistory, 
+                [resultFamily.insertId, dataDict.creationDate, dataDict.state, createdBy, createdBy]);
+            if(!resultState || resultState.affectedRows == 0)
+                throw 'FAILED_TO_ADD_STATE';
+
+            let resultSize = await pool.query(sqlAddHistory, 
+                [resultFamily.insertId, dataDict.creationDate, dataDict.size, createdBy, createdBy]);
+            if(!resultSize || resultSize.affectedRows == 0)
+                throw 'FAILED_TO_ADD_SIZE';
+
+            console.log([resultFamily, resultDetails, resultState, resultSize]);
+
+            if(resultFamily) {
+                callback('SUCCESS');
+            }else
+                callback(null);
+            
         } catch (err) {
             callback(err);
         }
@@ -477,17 +553,25 @@ Apiary.prototype = {
 
     // Delete ----------------------------------------------------------------------------
     deleteApiary: async function(apiaryID, callback) {
-        let sqlDelFamily = `DELETE FROM family
+        let sqlDelFamily = `UPDATE family
+                            SET Active = 0
                             WHERE HiveID IN (SELECT ID
                                 FROM hive
-                                WHERE ApiaryID = ?)`
-        let sqlDelHive = `DELETE FROM hive
+                                WHERE ApiaryID = ?
+                                    AND Active = 1)`
+        let sqlDelHive = `UPDATE hive
+                            SET Active = 0
+                            WHERE ApiaryID = ?
+                                AND Active = 1`;
+        let sqlDelGroup = `UPDATE hive_group
+                            SET Active = 0
+                            WHERE ApiaryID = ?
+                                AND Active = 1`;
+        let sqlDelUserApiary = `UPDATE user_apiary
+                            SET Active = 0
                             WHERE ApiaryID = ?`;
-        let sqlDelGroup = `DELETE FROM hive_group
-                            WHERE ApiaryID = ?`;
-        let sqlDelUserApiary = `DELETE FROM user_apiary
-                            WHERE ApiaryID = ?`;
-        let sqlDelApiary = `DELETE FROM apiary
+        let sqlDelApiary = `UPDATE apiary
+                            SET Active = 0
                             WHERE ID = ?`;
 
         try {
@@ -510,13 +594,18 @@ Apiary.prototype = {
     },
 
     deleteGroup: async function(groupID, callback) {
-        let sqlDelFamily = `DELETE FROM family
+        let sqlDelFamily = `UPDATE family
+                            SET Active = 0
                             WHERE HiveID IN (SELECT ID
                                 FROM hive
-                                WHERE GroupID = ?)`
-        let sqlDelHive = `DELETE FROM hive
-                            WHERE GroupID = ?`;
-        let sqlDelGroup = `DELETE FROM hive_group
+                                WHERE GroupID = ?
+                                    AND Active = 1)`
+        let sqlDelHive = `UPDATE hive
+                            SET Active = 0
+                            WHERE GroupID = ?
+                                AND Active = 1`;
+        let sqlDelGroup = `UPDATE hive_group
+                            SET Active = 0
                             WHERE ID = ?`;
 
         try {
@@ -540,9 +629,12 @@ Apiary.prototype = {
     },
     
     deleteHive: async function(hiveID, callback) {
-        let sqlDelFamily = `DELETE FROM family
-                            WHERE HiveID = ?`;
-        let sqlDelHive = `DELETE FROM hive
+        let sqlDelFamily = `UPDATE family
+                            SET Active = 0
+                            WHERE HiveID = ?
+                                AND Active = 1`;
+        let sqlDelHive = `UPDATE hive
+                            SET Active = 0
                             WHERE ID = ?`;
 
         try {
@@ -562,11 +654,14 @@ Apiary.prototype = {
     },
 
     deleteFamily: async function(familyID, callback) {
-        let sqlDelFamily = `DELETE FROM family
+        let sqlDelFamily = `UPDATE family
+                            SET Active = 0
                             WHERE ID = ?`;
 
         try {
             let resultFamily = await pool.query(sqlDelFamily, [familyID]);
+
+            console.log(resultFamily);
 
             if(resultFamily.affectedRows == 1){
                 callback('SUCCESS_FAMILY');

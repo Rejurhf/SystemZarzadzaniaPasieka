@@ -15,6 +15,7 @@ function generateGridView(){
             dataType: 'json',
             success: function(data){
                 if(data && data.length){
+                    console.log(data);
                     // Create Apiary grid
                     for(let apiary of data){
                         // Create Apiary -------------------------------------------------
@@ -128,7 +129,7 @@ function generateGridView(){
                                     let dataDict = {apiaryID: apiary['ApiaryID'],
                                         groupID: group['GroupID'],
                                         hiveID: hive['HiveID'],
-                                        familyID: hive['HiveID']};
+                                        familyID: hive['FamilyID']};
                                     if(hiveMenuItemList[i] === 'Usuń Ul'){
                                         menuItem.onclick = function(e){
                                             hiveDeleteOnClick(e, dataDict);
@@ -193,6 +194,7 @@ function hiveOnClick(hiveID){
     window.location = urlStr;
 }
 
+// Delete OnClick ------------------------------------------------------------------------
 function apiaryDeleteOnClick(e, dataDict){
     e.stopPropagation();
     let urlStr = '/apiary/' + dataDict['apiaryID']; 
@@ -265,6 +267,7 @@ function familyDeleteOnClick(e, dataDict){
     })
 }
 
+// Delete AddClick -----------------------------------------------------------------------
 function loadAddGroupOnClick(e, dataDict){
     e.stopPropagation();
     loadAddGroup(dataDict);

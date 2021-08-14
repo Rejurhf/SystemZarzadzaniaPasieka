@@ -20,8 +20,20 @@ div(id="modalAddFamily" class="modal")
                         option(value="")
                 .inputBox.creationDate
                     label Data stworzenia:
-                    input(type="datetime-local" not-null="true" 
+                    input(type="date" not-null="true" 
                         name="creationDate") 
+                .inputBox.state
+                    label Stan: 
+                    select(not-null="true" name="state")
+                        option(value="")
+                .inputBox.size
+                    label Wielkość: 
+                    select(not-null="true" name="size")
+                        option(value="")
+                .inputBox.origin
+                    label Pochodzenie: 
+                    select(not-null="true" name="origin")
+                        option(value="")
         hr
         .modal-footer
             button(onclick="closeModal(this)") Anuluj
