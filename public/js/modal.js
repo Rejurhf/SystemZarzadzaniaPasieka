@@ -141,7 +141,6 @@ function createAlert(message, severity){
 // Dropdowns -----------------------------------------------------------------------------
 function apiariesDropdown(modal, apiaryID){
     let select = modal.querySelector('.apiaryID select');
-    console.log(['apiary start', apiaryID]);
 
     // Get dropdown data
     if(select){
@@ -176,7 +175,6 @@ function apiariesDropdown(modal, apiaryID){
 
 function groupsDropdown(modal, apiaryIDParam, groupID){
     let select = modal.querySelector('.groupID select');
-    console.log(['group start', apiaryIDParam, groupID]);
 
     // Get dropdown data
     if(select){
@@ -193,13 +191,13 @@ function groupsDropdown(modal, apiaryIDParam, groupID){
                 if(data && data.length){
                     select.innerHTML = '';
                     select.appendChild(document.createElement('option'));
-                    let disableFlag = groupID === undefined ? true : false;
+                    let disableFlag = apiaryIDParam ? true : false;
+                    console.log([disableFlag, groupID]);
     
                     data.forEach(e => {
                         let opt = document.createElement('option');
                         opt.value = e.ID;
                         opt.innerHTML = e.Name;
-                        console.log([groupID, e.ID]);
                         if(parseInt(groupID, 10) === e.ID){
                             opt.selected = true;
                             disableFlag = true;
