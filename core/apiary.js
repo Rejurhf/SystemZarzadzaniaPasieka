@@ -317,7 +317,8 @@ Apiary.prototype = {
                     Attribute 
                     ,Description
                 FROM attribute
-                WHERE AttributeType = ?;`
+                WHERE AttributeType = ?
+                ORDER BY SequenceNo;`
 
         try {
             let result = await pool.query(sql, attributeType);
