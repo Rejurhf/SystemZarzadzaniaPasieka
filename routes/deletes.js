@@ -94,11 +94,11 @@ router.delete('/apiary/hive/:hiveID', (req, res) => {
 
 // Delete Family -------------------------------------------------------------------------
 router.delete('/apiary/family/:familyID', (req, res) => {
-    let sUserID = req.session.user.ID; 
-    logger.consoleLog(new Date(), ['DELETE /apiary/family/', req.params.familyID]);
+    let sUser = req.session.user; 
+    logger.consoleLog(new Date(), ['DELETE /apiary/family/', req.params.familyID, req.body]);
     
-    if(sUserID)
-        apiary.deleteFamily(req.params.familyID, function(result){
+    if(sUser)
+        apiary.deleteFamily(req.params.familyID, sUser.UserNo, req.body, function(result){
             if(result === 'SUCCESS_FAMILY'){
                 res.status(200).send({
                     isError: false, severity: 'Success', 

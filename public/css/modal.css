@@ -23,7 +23,7 @@
     border-radius: 3px;
     width: 80%;
     min-width: 225px;
-    max-width: 355px;
+    max-width: 360px;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
     -webkit-animation-name: animatetop;
     -webkit-animation-duration: 0.4s;
@@ -89,8 +89,13 @@
 .inputBox label{
     padding-top: 6px;
     display: inline-block;
-    width: 125px;
+    width: 130px;
     height: 21px;
+}
+
+.inputBox label.readOnly{
+    padding-left: 8px;
+    width: 200px;
 }
 
 .inputBox input{
@@ -111,4 +116,8 @@
 .notValid{
     box-shadow: 0 0 6px rgb(209, 0, 0);
     border-color: red;
+}
+
+.hidden{
+    display: none;
 }

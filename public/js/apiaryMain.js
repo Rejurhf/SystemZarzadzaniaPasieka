@@ -15,7 +15,6 @@ function generateGridView(){
             dataType: 'json',
             success: function(data){
                 if(data && data.length){
-                    console.log(data);
                     // Create Apiary grid
                     for(let apiary of data){
                         // Create Apiary -------------------------------------------------
@@ -27,6 +26,8 @@ function generateGridView(){
                         let apiaryMenuItemList = ['Dodaj Ul', 'Dodaj Grupę', 'Usuń Pasiekę'];
 
                         apiaryContainer.classList.add('apiary-container');
+                        apiaryContainer.setAttribute('value', apiary['ApiaryID']);
+                        apiaryContainer.setAttribute('name', apiary['ApiaryName']);
                         apiaryHeader.classList.add('apiary-header');
                         apiaryContent.classList.add('apiary-content');
 
@@ -99,6 +100,8 @@ function generateGridView(){
                             groupHeaderText.appendChild(groupMenu);
 
                             groupContainer.classList.add('group-container');
+                            groupContainer.setAttribute('value', group['GroupID']);
+                            groupContainer.setAttribute('name', group['GroupName']);
                             groupHeader.classList.add('group-header');
                             groupContent.classList.add('group-content');
                             
@@ -127,8 +130,11 @@ function generateGridView(){
                                     let menuItem = document.createElement('div');
                                     menuItem.classList.add('menu-item');
                                     let dataDict = {apiaryID: apiary['ApiaryID'],
+                                        apiaryName: apiary['ApiaryName'],
                                         groupID: group['GroupID'],
+                                        groupName: group['GroupName'],
                                         hiveID: hive['HiveID'],
+                                        hiveNum: hive['HiveNum'],
                                         familyID: hive['FamilyID']};
                                     if(hiveMenuItemList[i] === 'Usuń Ul'){
                                         menuItem.onclick = function(e){
@@ -136,7 +142,7 @@ function generateGridView(){
                                         };
                                     }else if(hiveMenuItemList[i] === 'Usuń Rodzinę'){
                                         menuItem.onclick = function(e){
-                                            familyDeleteOnClick(e, dataDict);
+                                            loadDeleteFamilyWrapper(e, dataDict);
                                         };
                                     }else if(hiveMenuItemList[i] === 'Dodaj Rodzinę'){
                                         menuItem.onclick = function(e){
@@ -154,6 +160,7 @@ function generateGridView(){
 
                                 // Add Hive tail on click
                                 hiveElem.setAttribute('value', hive['HiveID']);
+                                hiveElem.setAttribute('name', hive['HiveNum']);
                                 hiveElem.onclick = function(){
                                     hiveOnClick(hive['HiveID'])
                                 };
@@ -267,7 +274,7 @@ function familyDeleteOnClick(e, dataDict){
     })
 }
 
-// Delete AddClick -----------------------------------------------------------------------
+// Delete OnClick ------------------------------------------------------------------------
 function loadAddGroupOnClick(e, dataDict){
     e.stopPropagation();
     loadAddGroup(dataDict);
@@ -281,6 +288,11 @@ function loadAddHiveWrapper(e, dataDict){
 function loadAddFamilyWrapper(e, dataDict){
     e.stopPropagation();
     loadAddFamily(dataDict);
+}
+
+function loadDeleteFamilyWrapper(e, dataDict){
+    e.stopPropagation();
+    loadDeleteFamily(dataDict);
 }
 
 

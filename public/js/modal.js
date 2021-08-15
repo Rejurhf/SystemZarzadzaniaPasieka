@@ -1,12 +1,11 @@
 
-// Add Apiary ----------------------------------------------------------------------------
+// Add functions -------------------------------------------------------------------------
 function loadAddApiary(){
     let modal = document.getElementById('modalAddApiary'); 
     modal.style.display = 'block';
     modal.querySelector('.creationDate input').value = dateToInputString(new Date());
 }
 
-// Add Group -----------------------------------------------------------------------------
 function loadAddGroup(dataDict){
     let modal = document.getElementById('modalAddGroup');
     modal.style.display = 'block';
@@ -17,7 +16,6 @@ function loadAddGroup(dataDict){
     apiariesDropdown(modal, apiaryID);
 }
 
-// Add Hive ------------------------------------------------------------------------------
 function loadAddHive(dataDict){
     let modal = document.getElementById('modalAddHive');
     modal.style.display = 'block';
@@ -30,7 +28,6 @@ function loadAddHive(dataDict){
     groupsDropdown(modal, apiaryID, groupID);
 }
 
-// Add Family ----------------------------------------------------------------------------
 function loadAddFamily(dataDict){
     let modal = document.getElementById('modalAddFamily');
     modal.style.display = 'block';
@@ -39,11 +36,40 @@ function loadAddFamily(dataDict){
     let apiaryID = dataDict ? dataDict['apiaryID'] : null;
     let groupID = dataDict ? dataDict['groupID'] : null;
     let hiveID = dataDict ? dataDict['hiveID'] : null;
+	let attrDict = {name: ['state', 'size', 'origin'],
+					type: ['STATE', 'SIZE', 'ORIGIN']};
 
     apiariesDropdown(modal, apiaryID);
     groupsDropdown(modal, apiaryID, groupID);
     hivesDropdown(modal, apiaryID, groupID, hiveID);
-    familyAttributeDropdown(modal);
+    familyAttributeDropdown(modal, attrDict);
+}
+
+// Delete functions ----------------------------------------------------------------------
+function loadDeleteFamily(dataDict){
+    let modal = document.getElementById('modalDeleteFamily');
+    modal.style.display = 'block';
+    modal.querySelector('.transactionTime input').value = dateToInputString(new Date());
+
+    let labelApiary = modal.querySelector('.apiaryID .readOnly');
+    labelApiary.innerHTML = dataDict['apiaryName'];
+    labelApiary.setAttribute('value', dataDict['apiaryID']);
+	if(dataDict['groupID']){
+		let labelGroup = modal.querySelector('.groupID .readOnly');
+		labelGroup.innerHTML = dataDict['groupName'];
+		labelGroup.setAttribute('value', dataDict['groupID']);
+		modal.querySelector('.groupID').classList.remove('hidden');
+	}else{
+		modal.querySelector('.groupID').classList.add('hidden');
+	}
+    let labelHive = modal.querySelector('.hiveID .readOnly');
+    labelHive.innerHTML = dataDict['hiveNum'];
+    labelHive.setAttribute('value', dataDict['hiveID']);
+    modal.firstChild.setAttribute('action', `/apiary/family/${dataDict.familyID}`);
+
+	let attrDict = {name: ['state', 'size', 'endReason'],
+					type: ['STATE', 'SIZE', 'END_REASON']};
+	familyAttributeDropdown(modal, attrDict);
 }
 
 // Helper functions ----------------------------------------------------------------------
@@ -71,10 +97,9 @@ function validateModal(elem){
     let modal = elem.parentElement.parentElement;
     let dataDict = {};
 
-
     modal.querySelectorAll('input').forEach(e => {
         if(e.name != null && e.name != undefined && e.name != '' && !dataDict[e.name]){
-            if(e.getAttribute('not-null') === 'true' && !e.value){
+            if((e.getAttribute('not-null') === 'true' && !e.value)){
                 isValid = false;
                 e.classList.add('notValid');
             }
@@ -98,10 +123,11 @@ function validateModal(elem){
 
 function submitForm(modal, dataDict) {
     let actionURL = modal.getAttribute('action');
+    let actionType = modal.getAttribute('action-type');
     
     $.ajax({
         url: actionURL,
-        type: 'POST',
+        type: actionType,
         dataType: 'json',
         data: dataDict,
         success: function(data){
@@ -267,41 +293,33 @@ function hivesDropdown(modal, apiaryIDParam, groupIDParam, hiveID){
     }
 }
 
-function familyAttributeDropdown(modal){
-    let selectState = modal.querySelector('.state select');
-    let selectSize = modal.querySelector('.size select');
-    let selectOrigin = modal.querySelector('.origin select');
+function familyAttributeDropdown(modal, attrDict){
+	let select = [];
+	for(let i in attrDict.name){
+		select.push(modal.querySelector(`.${attrDict.name[i]} select`));
+	}
 
     // Get dropdown data
-    if(selectState){
+    if(select.length > 0){
         $.ajax({
             url: '/familyattributes',
-            type: 'GET',
+            type: 'POST',
             dataType: 'json',
+			data: attrDict,
             success: function(data){
                 if(data){
-                    selectState.innerHTML = '';
-                    selectSize.innerHTML = '';
-                    selectOrigin.innerHTML = '';
-
-                    data['state'].forEach(e => {
-                        let opt = document.createElement('option');
-                        opt.value = e.Attribute;
-                        opt.innerHTML = e.Description;
-                        selectState.appendChild(opt);
-                    }) 
-                    data['size'].forEach(e => {
-                        let opt = document.createElement('option');
-                        opt.value = e.Attribute;
-                        opt.innerHTML = e.Description;
-                        selectSize.appendChild(opt);
-                    }) 
-                    data['origin'].forEach(e => {
-                        let opt = document.createElement('option');
-                        opt.value = e.Attribute;
-                        opt.innerHTML = e.Description;
-                        selectOrigin.appendChild(opt);
-                    }) 
+					for(let i in attrDict.name){
+						select[i].innerHTML = '';
+						
+						if(data[attrDict.name[i]] != undefined){
+							data[attrDict.name[i]].forEach(e => {
+								let opt = document.createElement('option');
+								opt.value = e.Attribute;
+								opt.innerHTML = e.Description;
+								select[i].appendChild(opt);
+							})
+						}
+					}
                 }
             },
             error: function( jqXhr, textStatus, errorThrown ){

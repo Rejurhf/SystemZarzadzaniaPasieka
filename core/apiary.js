@@ -300,17 +300,18 @@ Apiary.prototype = {
         return;
     },
 
-    getFamilyAttributesForPopup: async function(callback){
+    getFamilyAttributesForPopup: async function(attrDict, callback){
         try{
-            let attributeState = this.getFamilyAttributes('STATE');
-            let attributeSize = this.getFamilyAttributes('SIZE');
-            let attributeOrigin = this.getFamilyAttributes('ORIGIN');
-            
-            let result = await Promise.all([attributeState, attributeSize, attributeOrigin]);
-            let resultDict = {state: result[0], size: result[1], origin: result[2]}
+            let attrList = [];
+            for(let i in attrDict['name[]'])
+                attrList.push(this.getFamilyAttributes(attrDict['type[]'][i]));
 
-            logger.consoleLog(new Date(), ['getFamilyAttributesForPopup', 
-                resultDict['state'], resultDict['size'], resultDict['origin']]);
+            let result = await Promise.all(attrList);
+            let resultDict = {};
+            for(let i in attrDict['name[]'])
+                resultDict[attrDict['name[]'][i]] = result[i];
+
+            logger.consoleLog(new Date(), ['getFamilyAttributesForPopup', resultDict]);
             
             if(result.length) {
                 callback(resultDict);
@@ -491,7 +492,6 @@ Apiary.prototype = {
                 throw 'GROUP_NOT_FOUND';
             if(result[2])
                 throw 'HIVE_ALREADY_EXISTS';
-            logger.consoleLog(new Date(), result);
             
             pool.query(sql, bind, function(err, hive){
                 if(err) throw err;
@@ -517,31 +517,28 @@ Apiary.prototype = {
         
         try{
             let hiveFound = await this.findActiveHive1(dataDict.hiveID);
+            let resultFamily = pool.query(sqlAddFamily, bind);
+            let resultDetails = pool.query(sqlAddDetails, 
+                [resultFamily.insertId, dataDict.origin, createdBy, createdBy]);
+            let resultState = pool.query(sqlAddHistory, 
+                [resultFamily.insertId, dataDict.creationDate, dataDict.state, createdBy, createdBy]);
+            let resultSize = pool.query(sqlAddHistory, 
+                [resultFamily.insertId, dataDict.creationDate, dataDict.size, createdBy, createdBy]);
+            
+            let result = await Promise.all([resultFamily, resultDetails, resultState, resultSize]);
+
             if(!hiveFound)
                 throw 'HIVE_NOT_FOUND';
-            
-            let resultFamily = await pool.query(sqlAddFamily, bind);
-            if(!resultFamily || resultFamily.affectedRows == 0)
+            else if(!result[0] || result[0].affectedRows == 0)
                 throw 'FAILED_TO_ADD_FAMILY';
-
-            let resultDetails = await pool.query(sqlAddDetails, 
-                [resultFamily.insertId, dataDict.origin, createdBy, createdBy]);
-            if(!resultDetails || resultDetails.affectedRows == 0)
+            else if(!result[1] || result[1].affectedRows == 0)
                 throw 'FAILED_TO_ADD_FAMILY';
-            
-            let resultState = await pool.query(sqlAddHistory, 
-                [resultFamily.insertId, dataDict.creationDate, dataDict.state, createdBy, createdBy]);
-            if(!resultState || resultState.affectedRows == 0)
+            else if(!result[2] || result[2].affectedRows == 0)
                 throw 'FAILED_TO_ADD_STATE';
-
-            let resultSize = await pool.query(sqlAddHistory, 
-                [resultFamily.insertId, dataDict.creationDate, dataDict.size, createdBy, createdBy]);
-            if(!resultSize || resultSize.affectedRows == 0)
+            else if(!result[3] || result[3].affectedRows == 0)
                 throw 'FAILED_TO_ADD_SIZE';
 
-            console.log([resultFamily, resultDetails, resultState, resultSize]);
-
-            if(resultFamily) {
+            if(result[0]) {
                 callback('SUCCESS');
             }else
                 callback(null);
@@ -653,17 +650,28 @@ Apiary.prototype = {
         }
     },
 
-    deleteFamily: async function(familyID, callback) {
+    deleteFamily: async function(familyID, updatedBy, dataDict, callback) {
         let sqlDelFamily = `UPDATE family
-                            SET Active = 0
-                            WHERE ID = ?`;
+            SET Active = 0
+            WHERE ID = ?`;
+        let sqlUpdateDetails = `INSERT INTO family_details(FamilyID, EndReason, LastUpdatedBy)
+            VALUES (?, ?, ?)
+            ON DUPLICATE KEY UPDATE EndReason = ?, LastUpdatedBy = ?`
+        let sqlAddHistory = `INSERT INTO family_history(FamilyID, TransactionTime, Attribute, CreatedBy, LastUpdatedBy, Active)
+            VALUE(?, ?, ?, ?, ?, 1)`;
 
         try {
-            let resultFamily = await pool.query(sqlDelFamily, [familyID]);
+            let resultFamily = pool.query(sqlDelFamily, [familyID]);
+            let resultDetails = pool.query(sqlUpdateDetails, 
+                [familyID, dataDict.endReason, updatedBy, dataDict.endReason, updatedBy]);
+            let resultState = pool.query(sqlAddHistory, 
+                [familyID, dataDict.transactionTime, dataDict.state, updatedBy, updatedBy]);
+            let resultSize = pool.query(sqlAddHistory, 
+                [familyID, dataDict.transactionTime, dataDict.size, updatedBy, updatedBy]);
 
-            console.log(resultFamily);
+            let result = await Promise.all([resultFamily, resultDetails, resultState, resultSize]);
 
-            if(resultFamily.affectedRows == 1){
+            if(result[0].affectedRows == 1){
                 callback('SUCCESS_FAMILY');
             }else{
                 callback(null);

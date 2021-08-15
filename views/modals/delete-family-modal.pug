@@ -1,0 +1,39 @@
+
+div(id="modalDeleteFamily" class="modal")
+    .modal-content(action="/family" action-type="DELETE")
+        .modal-header
+            span(class="close" onclick="closeModal(this)") &times;
+            h2 Usuń Rodzinę
+        .modal-body
+            form
+                .inputBox.apiaryID
+                    label Pasieka: 
+                    label(name="apiaryID").readOnly
+                .inputBox.groupID
+                    label Nazwa grupy: 
+                    label(name="groupID").readOnly
+                .inputBox.hiveID
+                    label Numer ula: 
+                    label(name="hiveID").readOnly
+                .inputBox.endReason
+                    label Powód usunięcia: 
+                    select(not-null="true" name="endReason")
+                        option(value="")
+                .inputBox.transactionTime
+                    label Data usunięcia:
+                    input(type="date" not-null="true" name="transactionTime") 
+                .inputBox.state
+                    label Stan: 
+                    select(not-null="true" name="state")
+                        option(value="")
+                .inputBox.size
+                    label Wielkość: 
+                    select(not-null="true" name="size")
+                        option(value="")
+                .inputBox.price
+                    label Cena: 
+                    input(type="number" name="price")
+        hr
+        .modal-footer
+            button(onclick="closeModal(this)") Anuluj
+            button(onclick="validateModal(this)") Usuń

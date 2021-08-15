@@ -22,11 +22,12 @@ router.get('/apiaries', (req, res) => {
 })
 
 // Get Family Attributes
-router.get('/familyattributes', (req, res) => {
+router.post('/familyattributes', (req, res) => {
     let sUserID = req.session.user.ID; 
+    logger.consoleLog(new Date(), ['GET /familyattributes', req.body]);
     
     if(sUserID){
-        apiary.getFamilyAttributesForPopup(function(result){
+        apiary.getFamilyAttributesForPopup(req.body, function(result){
             res.json(result);
         })
     }else{
@@ -68,10 +69,7 @@ router.post('/hives', (req, res) => {
     let groupID = req.body.groupID; 
     let sUserID = req.session.user.ID;
     
-    let curDateTime = new Date();
-    logger.consoleLog(new Date(), curDateTime.toLocaleString(), '--------------------------------');
     logger.consoleLog(new Date(), ['GET /hives', apiaryID, groupID]);
-    
     
     if(sUserID){
         if(apiaryID && apiaryID != ''){

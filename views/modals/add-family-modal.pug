@@ -1,5 +1,5 @@
 div(id="modalAddFamily" class="modal")
-    .modal-content(action="/family")
+    .modal-content(action="/family" action-type="POST")
         .modal-header
             span(class="close" onclick="closeModal(this)") &times;
             h2 Dodaj Rodzinę
@@ -34,6 +34,9 @@ div(id="modalAddFamily" class="modal")
                     label Pochodzenie: 
                     select(not-null="true" name="origin")
                         option(value="")
+                .inputBox.price
+                    label Cena: 
+                    input(type="number" step="0.01" name="price")
         hr
         .modal-footer
             button(onclick="closeModal(this)") Anuluj
