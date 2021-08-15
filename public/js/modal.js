@@ -43,6 +43,7 @@ function loadAddFamily(dataDict){
     groupsDropdown(modal, apiaryID, groupID);
     hivesDropdown(modal, apiaryID, groupID, hiveID);
     familyAttributeDropdown(modal, attrDict);
+    familiesDropdown(modal);
 }
 
 // Delete functions ----------------------------------------------------------------------
@@ -84,6 +85,7 @@ function dateTimeToInputString(date){
         z(date.getMinutes()); 
 }
 
+// Return string date for datetime selector format "YYYY-mm-DD"
 function dateToInputString(date){
     let z  = n =>  ('0' + n).slice(-2);
 
@@ -99,7 +101,8 @@ function validateModal(elem){
 
     modal.querySelectorAll('input').forEach(e => {
         if(e.name != null && e.name != undefined && e.name != '' && !dataDict[e.name]){
-            if((e.getAttribute('not-null') === 'true' && !e.value)){
+            if((e.getAttribute('not-null') === 'true' && !e.value) || 
+                    (e.getAttribute('name') === 'hiveNum' && !(/^\d+$/.test(e.value)))){
                 isValid = false;
                 e.classList.add('notValid');
             }
@@ -293,6 +296,35 @@ function hivesDropdown(modal, apiaryIDParam, groupIDParam, hiveID){
     }
 }
 
+function familiesDropdown(modal){
+    let select = modal.querySelector('.parentID select');
+
+    // Get dropdown data
+    if(select){
+        $.ajax({
+            url: '/apiary/familylist',
+            type: 'GET',
+            dataType: 'json',
+            success: function(data){
+                if(data && data.length){
+                    select.innerHTML = '';
+                    select.appendChild(document.createElement('option'));
+
+                    data.forEach(e => {
+                        let opt = document.createElement('option');
+                        opt.value = e.ID;
+                        opt.innerHTML = e.Name;
+                        select.appendChild(opt);
+                    })
+                }
+            },
+            error: function( jqXhr, textStatus, errorThrown ){
+                createAlert(jqXhr.responseText, 'Error');
+            }
+        })
+    }
+}
+
 function familyAttributeDropdown(modal, attrDict){
 	let select = [];
 	for(let i in attrDict.name){
@@ -318,6 +350,14 @@ function familyAttributeDropdown(modal, attrDict){
 								opt.innerHTML = e.Description;
 								select[i].appendChild(opt);
 							})
+
+                            if((attrDict.name[i] === 'origin' && select[i].value != 'PURCHASE') || 
+                                    (attrDict.name[i] === 'endReason' && select[i].value != 'SALE'))
+                                modal.querySelector('.price').classList.add('hidden');
+                            
+                            if((attrDict.name[i] === 'origin' && select[i].value === 'PURCHASE'))
+                                modal.querySelector('.parentID').classList.add('hidden');
+                        
 						}
 					}
                 }
@@ -345,5 +385,18 @@ function onChangeGroup(elem){
     hivesDropdown(modal);
 }
 
+function onChangePriceInfluence(elem){
+    let modal = $(elem).closest('.modal')[0];
+    let selectPrice =  modal.querySelector('.price');
+    let selectParent =  modal.querySelector('.parentID');
+
+    if(elem.value === 'PURCHASE' || elem.value === 'SALE'){
+        selectPrice.classList.remove('hidden');
+        selectParent.classList.add('hidden');
+    }else{
+        selectPrice.classList.add('hidden');
+        selectParent.classList.remove('hidden');
+    }
+}
 
 

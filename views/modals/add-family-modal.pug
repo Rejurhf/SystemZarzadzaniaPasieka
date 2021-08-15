@@ -32,7 +32,12 @@ div(id="modalAddFamily" class="modal")
                         option(value="")
                 .inputBox.origin
                     label Pochodzenie: 
-                    select(not-null="true" name="origin")
+                    select(not-null="true" name="origin" 
+                            onchange="onChangePriceInfluence(this)")
+                        option(value="")
+                .inputBox.parentID
+                    label Ul macierzysty: 
+                    select(name="parentID")
                         option(value="")
                 .inputBox.price
                     label Cena: 

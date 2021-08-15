@@ -281,6 +281,37 @@ Apiary.prototype = {
         })
     },
 
+    getUserFamilyList: function(userID, callback){
+        let sql = `SELECT 
+                F.ID AS ID
+                ,CASE 
+                    WHEN HG.ID IS NULL
+                        THEN CONCAT(A.ApiaryNo, ' - ', H.Number)
+                    ELSE CONCAT(A.ApiaryNo, ' - ', HG.Name, ' - ', H.Number)
+                END AS Name
+            FROM family F
+                JOIN hive H
+                    ON H.ID = F.HiveID
+                LEFT JOIN hive_group HG
+                    ON HG.ID = H.GroupID
+                JOIN apiary A
+                    ON A.ID = H.ApiaryID
+                JOIN user_apiary UA
+                    ON UA.ApiaryID = A.ID
+            WHERE F.Active = 1
+                AND UA.UserID = ?
+            ORDER BY A.ApiaryNo, HG.Name, H.Number`
+
+        pool.query(sql, [userID], function(err, result){
+            if(err) throw err;
+
+            if(result.length) {
+                callback(result);
+            }else
+                callback(null);
+        })
+    },
+
     getFamilyAttributes: async function(attributeType){
         let sql = `SELECT
                     Attribute 
@@ -507,35 +538,48 @@ Apiary.prototype = {
     },
 
     createFamily: async function(dataDict, createdBy, callback){
-        let sqlAddFamily = `INSERT INTO family(HiveID, StartTime, CreatedBy, LastUpdatedBy, Active)
+        let sqlAddFamily = `INSERT INTO family(HiveID, StartTime, 
+                CreatedBy, LastUpdatedBy, Active)
             VALUE(?, ?, ?, ?, 1)`;
-        let sqlAddDetails = `INSERT INTO family_details(FamilyID, Origin, CreatedBy, LastUpdatedBy, Active)
-            VALUE(?, ?, ?, ?, 1)`;
-        let sqlAddHistory = `INSERT INTO family_history(FamilyID, TransactionTime, Attribute, CreatedBy, LastUpdatedBy, Active)
+        let sqlAddDetails = `INSERT INTO family_details(FamilyID, Origin, ParentFamilyID, 
+                PricePurchese, CreatedBy, LastUpdatedBy, Active)
+            VALUE(?, ?, ?, ?, ?, ?, 1)`;
+        let sqlAddHistory = `INSERT INTO family_history(FamilyID, TransactionTime, Attribute, 
+                CreatedBy, LastUpdatedBy, Active)
             VALUE(?, ?, ?, ?, ?, 1)`;
-        let bind = [dataDict.hiveID, dataDict.creationDate, createdBy, createdBy];
-        
+
+        let price = null;
+        let parentID = null;
+        if(dataDict.origin === 'PURCHASE' && dataDict.price.length > 0)
+            price = dataDict.price;
+        else if(dataDict.origin != 'PURCHASE' && dataDict.parentID.length > 0)
+            parentID = dataDict.parentID;
+            
         try{
             let hiveFound = await this.findActiveHive1(dataDict.hiveID);
-            let resultFamily = pool.query(sqlAddFamily, bind);
-            let resultDetails = pool.query(sqlAddDetails, 
-                [resultFamily.insertId, dataDict.origin, createdBy, createdBy]);
-            let resultState = pool.query(sqlAddHistory, 
-                [resultFamily.insertId, dataDict.creationDate, dataDict.state, createdBy, createdBy]);
-            let resultSize = pool.query(sqlAddHistory, 
-                [resultFamily.insertId, dataDict.creationDate, dataDict.size, createdBy, createdBy]);
-            
-            let result = await Promise.all([resultFamily, resultDetails, resultState, resultSize]);
-
             if(!hiveFound)
                 throw 'HIVE_NOT_FOUND';
+
+            let resultFamily = await pool.query(sqlAddFamily, 
+                [dataDict.hiveID, dataDict.creationDate, createdBy, createdBy]);
+            let resultDetails = pool.query(sqlAddDetails, 
+                [resultFamily.insertId, dataDict.origin, parentID, price, createdBy, createdBy]);
+            let resultState = pool.query(sqlAddHistory, 
+                [resultFamily.insertId, dataDict.creationDate, dataDict.state, 
+                    createdBy, createdBy]);
+            let resultSize = pool.query(sqlAddHistory, 
+                [resultFamily.insertId, dataDict.creationDate, dataDict.size, 
+                    createdBy, createdBy]);
+            
+            let result = await Promise.all([resultDetails, resultState, resultSize]);
+
+            if(!resultFamily || resultFamily.affectedRows == 0)
+                throw 'FAILED_TO_ADD_FAMILY';
             else if(!result[0] || result[0].affectedRows == 0)
                 throw 'FAILED_TO_ADD_FAMILY';
             else if(!result[1] || result[1].affectedRows == 0)
-                throw 'FAILED_TO_ADD_FAMILY';
-            else if(!result[2] || result[2].affectedRows == 0)
                 throw 'FAILED_TO_ADD_STATE';
-            else if(!result[3] || result[3].affectedRows == 0)
+            else if(!result[2] || result[2].affectedRows == 0)
                 throw 'FAILED_TO_ADD_SIZE';
 
             if(result[0]) {
@@ -653,17 +697,22 @@ Apiary.prototype = {
     deleteFamily: async function(familyID, updatedBy, dataDict, callback) {
         let sqlDelFamily = `UPDATE family
             SET Active = 0
+                ,EndTime = ?
             WHERE ID = ?`;
-        let sqlUpdateDetails = `INSERT INTO family_details(FamilyID, EndReason, LastUpdatedBy)
-            VALUES (?, ?, ?)
-            ON DUPLICATE KEY UPDATE EndReason = ?, LastUpdatedBy = ?`
-        let sqlAddHistory = `INSERT INTO family_history(FamilyID, TransactionTime, Attribute, CreatedBy, LastUpdatedBy, Active)
+        let sqlUpdateDetails = `INSERT INTO family_details(FamilyID, EndReason, PriceSell, LastUpdatedBy)
+            VALUES (?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE EndReason = ?, PriceSell = ?, LastUpdatedBy = ?`
+        let sqlAddHistory = `INSERT INTO family_history(FamilyID, TransactionTime, Attribute, 
+                CreatedBy, LastUpdatedBy, Active)
             VALUE(?, ?, ?, ?, ?, 1)`;
+        let price = null;
+        if(dataDict.price.length >= 0 && dataDict.endReason === 'SALE')
+            price = dataDict.price;
 
         try {
-            let resultFamily = pool.query(sqlDelFamily, [familyID]);
+            let resultFamily = pool.query(sqlDelFamily, [dataDict.transactionTime, familyID]);
             let resultDetails = pool.query(sqlUpdateDetails, 
-                [familyID, dataDict.endReason, updatedBy, dataDict.endReason, updatedBy]);
+                [familyID, dataDict.endReason, price, updatedBy, dataDict.endReason, price, updatedBy]);
             let resultState = pool.query(sqlAddHistory, 
                 [familyID, dataDict.transactionTime, dataDict.state, updatedBy, updatedBy]);
             let resultSize = pool.query(sqlAddHistory, 

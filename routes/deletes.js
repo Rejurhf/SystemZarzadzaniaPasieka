@@ -99,6 +99,7 @@ router.delete('/apiary/family/:familyID', (req, res) => {
     
     if(sUser)
         apiary.deleteFamily(req.params.familyID, sUser.UserNo, req.body, function(result){
+            logger.consoleLog(new Date(), result);
             if(result === 'SUCCESS_FAMILY'){
                 res.status(200).send({
                     isError: false, severity: 'Success', 
@@ -106,7 +107,7 @@ router.delete('/apiary/family/:familyID', (req, res) => {
             }else{
                 res.status(200).send({
                     isError: true, severity: 'Error', 
-                        message: 'Nie można usunąć tej rodziny.'});
+                    message: 'Nie można usunąć tej rodziny.'});
             }
         })
     else{

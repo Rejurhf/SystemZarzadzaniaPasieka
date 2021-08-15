@@ -17,7 +17,8 @@ div(id="modalDeleteFamily" class="modal")
                     label(name="hiveID").readOnly
                 .inputBox.endReason
                     label Powód usunięcia: 
-                    select(not-null="true" name="endReason")
+                    select(not-null="true" name="endReason" 
+                            onchange="onChangePriceInfluence(this)")
                         option(value="")
                 .inputBox.transactionTime
                     label Data usunięcia:
