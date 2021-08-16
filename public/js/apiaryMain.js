@@ -256,25 +256,7 @@ function hiveDeleteOnClick(e, dataDict){
     })
 }
 
-function familyDeleteOnClick(e, dataDict){
-    e.stopPropagation();
-    let urlStr = '/apiary/family/' + dataDict['familyID']; 
-
-    $.ajax({
-        url: urlStr,
-        type: 'DELETE',
-        dataType: 'json',
-        success: function(data){
-            createAlert(data.message, data.severity);
-            generateGridView();
-        },
-        error: function( jqXhr, textStatus, errorThrown ){
-            createAlert(jqXhr.responseText, 'Error');
-        }
-    })
-}
-
-// Delete OnClick ------------------------------------------------------------------------
+// Add Wrapper ---------------------------------------------------------------------------
 function loadAddGroupOnClick(e, dataDict){
     e.stopPropagation();
     loadAddGroup(dataDict);
@@ -290,11 +272,87 @@ function loadAddFamilyWrapper(e, dataDict){
     loadAddFamily(dataDict);
 }
 
+// Delete Wrapper ------------------------------------------------------------------------
 function loadDeleteFamilyWrapper(e, dataDict){
     e.stopPropagation();
     loadDeleteFamily(dataDict);
 }
 
+// Add functions -------------------------------------------------------------------------
+function loadAddApiary(){
+    let modal = document.getElementById('modalAddApiary'); 
+    modal.style.display = 'block';
+    modal.querySelector('.creationDate input').value = dateToInputString(new Date());
+}
 
+function loadAddGroup(dataDict){
+    let modal = document.getElementById('modalAddGroup');
+    modal.style.display = 'block';
+    modal.querySelector('.creationDate input').value = dateToInputString(new Date());
 
+    let apiaryID = dataDict ? dataDict['apiaryID'] : null;
 
+    apiariesDropdown(modal, apiaryID);
+}
+
+function loadAddHive(dataDict){
+    let modal = document.getElementById('modalAddHive');
+    modal.style.display = 'block';
+    modal.querySelector('.creationDate input').value = dateToInputString(new Date());
+
+    let apiaryID = dataDict ? dataDict['apiaryID'] : null;
+    let groupID = dataDict ? dataDict['groupID'] : null;
+
+    apiariesDropdown(modal, apiaryID);
+    groupsDropdown(modal, apiaryID, groupID);
+}
+
+function loadAddFamily(dataDict){
+    let modal = document.getElementById('modalAddFamily');
+    modal.style.display = 'block';
+    modal.querySelector('.creationDate input').value = dateToInputString(new Date());
+    modal.querySelector('.comment textarea').value = '';
+        
+    let apiaryID = dataDict ? dataDict['apiaryID'] : null;
+    let groupID = dataDict ? dataDict['groupID'] : null;
+    let hiveID = dataDict ? dataDict['hiveID'] : null;
+	let attrDict = {name: ['state', 'size', 'origin'],
+					type: ['STATE', 'SIZE', 'ORIGIN']};
+
+    apiariesDropdown(modal, apiaryID);
+    groupsDropdown(modal, apiaryID, groupID);
+    hivesDropdown(modal, apiaryID, groupID, hiveID);
+    familyAttributeDropdown(modal, attrDict);
+    familiesDropdown(modal);
+}
+
+// Delete functions ----------------------------------------------------------------------
+function loadDeleteFamily(dataDict){
+    let modal = document.getElementById('modalDeleteFamily');
+    modal.style.display = 'block';
+    // Add date and clear comment
+    modal.querySelector('.transactionTime input').value = dateToInputString(new Date());
+    modal.querySelector('.comment textarea').value = '';
+
+    // Insert readOnly values (Apriary, Group, Hive)
+    let labelApiary = modal.querySelector('.apiaryID .readOnly');
+    labelApiary.innerHTML = dataDict['apiaryName'];
+    labelApiary.setAttribute('value', dataDict['apiaryID']);
+	if(dataDict['groupID']){
+		let labelGroup = modal.querySelector('.groupID .readOnly');
+		labelGroup.innerHTML = dataDict['groupName'];
+		labelGroup.setAttribute('value', dataDict['groupID']);
+		modal.querySelector('.groupID').classList.remove('hidden');
+	}else{
+		modal.querySelector('.groupID').classList.add('hidden');
+	}
+    let labelHive = modal.querySelector('.hiveID .readOnly');
+    labelHive.innerHTML = dataDict['hiveNum'];
+    labelHive.setAttribute('value', dataDict['hiveID']);
+    modal.firstChild.setAttribute('action', `/apiary/family/${dataDict.familyID}`);
+
+    // Get Attributes
+	let attrDict = {name: ['state', 'size', 'endReason'],
+					type: ['STATE', 'SIZE', 'END_REASON']};
+	familyAttributeDropdown(modal, attrDict);
+}

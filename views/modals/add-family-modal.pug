@@ -42,6 +42,9 @@ div(id="modalAddFamily" class="modal")
                 .inputBox.price
                     label Cena: 
                     input(type="number" step="0.01" name="price")
+                .inputBox.comment
+                    label Uwagi: 
+                    textarea(name="comment", cols="30", rows="2")
         hr
         .modal-footer
             button(onclick="closeModal(this)") Anuluj

@@ -1,78 +1,4 @@
 
-// Add functions -------------------------------------------------------------------------
-function loadAddApiary(){
-    let modal = document.getElementById('modalAddApiary'); 
-    modal.style.display = 'block';
-    modal.querySelector('.creationDate input').value = dateToInputString(new Date());
-}
-
-function loadAddGroup(dataDict){
-    let modal = document.getElementById('modalAddGroup');
-    modal.style.display = 'block';
-    modal.querySelector('.creationDate input').value = dateToInputString(new Date());
-
-    let apiaryID = dataDict ? dataDict['apiaryID'] : null;
-
-    apiariesDropdown(modal, apiaryID);
-}
-
-function loadAddHive(dataDict){
-    let modal = document.getElementById('modalAddHive');
-    modal.style.display = 'block';
-    modal.querySelector('.creationDate input').value = dateToInputString(new Date());
-
-    let apiaryID = dataDict ? dataDict['apiaryID'] : null;
-    let groupID = dataDict ? dataDict['groupID'] : null;
-
-    apiariesDropdown(modal, apiaryID);
-    groupsDropdown(modal, apiaryID, groupID);
-}
-
-function loadAddFamily(dataDict){
-    let modal = document.getElementById('modalAddFamily');
-    modal.style.display = 'block';
-    modal.querySelector('.creationDate input').value = dateToInputString(new Date());
-        
-    let apiaryID = dataDict ? dataDict['apiaryID'] : null;
-    let groupID = dataDict ? dataDict['groupID'] : null;
-    let hiveID = dataDict ? dataDict['hiveID'] : null;
-	let attrDict = {name: ['state', 'size', 'origin'],
-					type: ['STATE', 'SIZE', 'ORIGIN']};
-
-    apiariesDropdown(modal, apiaryID);
-    groupsDropdown(modal, apiaryID, groupID);
-    hivesDropdown(modal, apiaryID, groupID, hiveID);
-    familyAttributeDropdown(modal, attrDict);
-    familiesDropdown(modal);
-}
-
-// Delete functions ----------------------------------------------------------------------
-function loadDeleteFamily(dataDict){
-    let modal = document.getElementById('modalDeleteFamily');
-    modal.style.display = 'block';
-    modal.querySelector('.transactionTime input').value = dateToInputString(new Date());
-
-    let labelApiary = modal.querySelector('.apiaryID .readOnly');
-    labelApiary.innerHTML = dataDict['apiaryName'];
-    labelApiary.setAttribute('value', dataDict['apiaryID']);
-	if(dataDict['groupID']){
-		let labelGroup = modal.querySelector('.groupID .readOnly');
-		labelGroup.innerHTML = dataDict['groupName'];
-		labelGroup.setAttribute('value', dataDict['groupID']);
-		modal.querySelector('.groupID').classList.remove('hidden');
-	}else{
-		modal.querySelector('.groupID').classList.add('hidden');
-	}
-    let labelHive = modal.querySelector('.hiveID .readOnly');
-    labelHive.innerHTML = dataDict['hiveNum'];
-    labelHive.setAttribute('value', dataDict['hiveID']);
-    modal.firstChild.setAttribute('action', `/apiary/family/${dataDict.familyID}`);
-
-	let attrDict = {name: ['state', 'size', 'endReason'],
-					type: ['STATE', 'SIZE', 'END_REASON']};
-	familyAttributeDropdown(modal, attrDict);
-}
-
 // Helper functions ----------------------------------------------------------------------
 // Return string date for datetime selector format "YYYY-mm-DDTHH:MM"
 function dateTimeToInputString(date){
@@ -110,6 +36,15 @@ function validateModal(elem){
         }
     })
     modal.querySelectorAll('select').forEach(e => {
+        if(e.name != null && e.name != undefined && e.name != '' && !dataDict[e.name]){
+            if(e.getAttribute('not-null') === 'true' && !e.value){
+                isValid = false;
+                e.classList.add('notValid');
+            }
+            dataDict[e.name] = e.value;
+        }
+    })
+    modal.querySelectorAll('textarea').forEach(e => {
         if(e.name != null && e.name != undefined && e.name != '' && !dataDict[e.name]){
             if(e.getAttribute('not-null') === 'true' && !e.value){
                 isValid = false;
@@ -398,5 +333,3 @@ function onChangePriceInfluence(elem){
         selectParent.classList.remove('hidden');
     }
 }
-
-
