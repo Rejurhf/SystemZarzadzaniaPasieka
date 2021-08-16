@@ -545,9 +545,9 @@ Apiary.prototype = {
         let sqlAddDetails = `INSERT INTO family_details(FamilyID, Origin, ParentFamilyID, 
                 PricePurchese, CreatedBy, LastUpdatedBy, Active)
             VALUE(?, ?, ?, ?, ?, ?, 1)`;
-        let sqlAddHistory = `INSERT INTO family_history(FamilyID, TransactionTime, Attribute, 
+        let sqlAddInspection = `INSERT INTO INSPECTION(FamilyID, DateTime, State, Size, Comment, 
                 CreatedBy, LastUpdatedBy, Active)
-            VALUE(?, ?, ?, ?, ?, 1)`;
+            VALUE(?, ?, ?, ?, ?, ?, ?, 1)`;
 
         let price = null;
         let parentID = null;
@@ -555,6 +555,10 @@ Apiary.prototype = {
             price = dataDict.price;
         else if(dataDict.origin != 'PURCHASE' && dataDict.parentID.length > 0)
             parentID = dataDict.parentID;
+        
+        let comment = null;
+        if(dataDict.comment && dataDict.comment != undefined && dataDict.comment.length > 0)
+            comment = dataDict.comment;
             
         try{
             let hiveFound = await this.findActiveHive1(dataDict.hiveID);
@@ -565,23 +569,18 @@ Apiary.prototype = {
                 [dataDict.hiveID, dataDict.creationDate, createdBy, createdBy]);
             let resultDetails = pool.query(sqlAddDetails, 
                 [resultFamily.insertId, dataDict.origin, parentID, price, createdBy, createdBy]);
-            let resultState = pool.query(sqlAddHistory, 
+            let resultInspection = pool.query(sqlAddInspection, 
                 [resultFamily.insertId, dataDict.creationDate, dataDict.state, 
-                    createdBy, createdBy]);
-            let resultSize = pool.query(sqlAddHistory, 
-                [resultFamily.insertId, dataDict.creationDate, dataDict.size, 
-                    createdBy, createdBy]);
+                    dataDict.size, dataDict.comment, createdBy, createdBy]);
             
-            let result = await Promise.all([resultDetails, resultState, resultSize]);
+            let result = await Promise.all([resultDetails, resultInspection]);
 
             if(!resultFamily || resultFamily.affectedRows == 0)
                 throw 'FAILED_TO_ADD_FAMILY';
             else if(!result[0] || result[0].affectedRows == 0)
                 throw 'FAILED_TO_ADD_FAMILY';
             else if(!result[1] || result[1].affectedRows == 0)
-                throw 'FAILED_TO_ADD_STATE';
-            else if(!result[2] || result[2].affectedRows == 0)
-                throw 'FAILED_TO_ADD_SIZE';
+                throw 'FAILED_TO_ADD_INSPECTION';
 
             if(result[0]) {
                 callback('SUCCESS');
@@ -697,29 +696,32 @@ Apiary.prototype = {
 
     deleteFamily: async function(familyID, updatedBy, dataDict, callback) {
         let sqlDelFamily = `UPDATE family
-            SET Active = 0
-                ,EndTime = ?
+            SET Active = 0, EndTime = ?
             WHERE ID = ?`;
         let sqlUpdateDetails = `INSERT INTO family_details(FamilyID, EndReason, PriceSell, LastUpdatedBy)
             VALUES (?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE EndReason = ?, PriceSell = ?, LastUpdatedBy = ?`
-        let sqlAddHistory = `INSERT INTO family_history(FamilyID, TransactionTime, Attribute, 
+        let sqlAddInspection = `INSERT INTO INSPECTION(FamilyID, DateTime, State, Size, Comment, 
                 CreatedBy, LastUpdatedBy, Active)
-            VALUE(?, ?, ?, ?, ?, 1)`;
+            VALUE(?, ?, ?, ?, ?, ?, ?, 1)`;
+
         let price = null;
         if(dataDict.price.length >= 0 && dataDict.endReason === 'SALE')
             price = dataDict.price;
+		
+		let comment = null;
+		if(dataDict.comment && dataDict.comment != undefined && dataDict.comment.length > 0)
+			comment = dataDict.comment;
 
         try {
             let resultFamily = pool.query(sqlDelFamily, [dataDict.transactionTime, familyID]);
             let resultDetails = pool.query(sqlUpdateDetails, 
                 [familyID, dataDict.endReason, price, updatedBy, dataDict.endReason, price, updatedBy]);
-            let resultState = pool.query(sqlAddHistory, 
-                [familyID, dataDict.transactionTime, dataDict.state, updatedBy, updatedBy]);
-            let resultSize = pool.query(sqlAddHistory, 
-                [familyID, dataDict.transactionTime, dataDict.size, updatedBy, updatedBy]);
+            let resultInspection = pool.query(sqlAddInspection, 
+                [familyID, dataDict.transactionTime, dataDict.state, 
+                    dataDict.size, dataDict.comment, updatedBy, updatedBy]);
 
-            let result = await Promise.all([resultFamily, resultDetails, resultState, resultSize]);
+            let result = await Promise.all([resultFamily, resultDetails, resultInspection]);
 
             if(result[0].affectedRows == 1){
                 callback('SUCCESS_FAMILY');
