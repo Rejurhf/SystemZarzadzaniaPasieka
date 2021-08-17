@@ -316,8 +316,8 @@ function loadAddFamily(dataDict){
     let apiaryID = dataDict ? dataDict['apiaryID'] : null;
     let groupID = dataDict ? dataDict['groupID'] : null;
     let hiveID = dataDict ? dataDict['hiveID'] : null;
-	let attrDict = {name: ['state', 'size', 'origin'],
-					type: ['STATE', 'SIZE', 'ORIGIN']};
+	let attrDict = {name: ['state', 'size'],
+					type: ['STATE', 'SIZE']};
 
     apiariesDropdown(modal, apiaryID);
     groupsDropdown(modal, apiaryID, groupID);

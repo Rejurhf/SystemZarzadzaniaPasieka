@@ -1,5 +1,5 @@
 div(id="modalAddHive" class="modal")
-    .modal-content(action="/hive" action-type="POST")
+    .modal-content(action="/hive" action-type="POST" grid-refresh="True")
         .modal-header
             span(class="close" onclick="closeModal(this)") &times;
             h2 Dodaj Ul
@@ -23,5 +23,5 @@ div(id="modalAddHive" class="modal")
                         name="creationDate") 
         hr
         .modal-footer
-            button(onclick="closeModal(this)") Anuluj
+            button.secondary(onclick="closeModal(this)") Anuluj
             button(onclick="validateModal(this)") Dodaj

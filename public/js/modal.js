@@ -62,6 +62,7 @@ function validateModal(elem){
 function submitForm(modal, dataDict) {
     let actionURL = modal.getAttribute('action');
     let actionType = modal.getAttribute('action-type');
+    let isGridRefresh = modal.getAttribute('grid-refresh');
     
     $.ajax({
         url: actionURL,
@@ -70,7 +71,9 @@ function submitForm(modal, dataDict) {
         data: dataDict,
         success: function(data){
             createAlert(data.message, data.severity);
-            generateGridView();
+            if(isGridRefresh === 'True'){
+                generateGridView();
+            }
             if(!data.isError){
                 closeModal(modal);
             }
@@ -231,6 +234,49 @@ function hivesDropdown(modal, apiaryIDParam, groupIDParam, hiveID){
     }
 }
 
+function occupiedHivesDropdown(modal, apiaryIDParam, groupIDParam, hiveID){
+    let select = modal.querySelector('.hiveID select');
+
+    if(select){
+        let apiaryID = apiaryIDParam ? 
+            apiaryIDParam : modal.querySelector('.apiaryID select').value;
+        let groupID = groupIDParam ? 
+            groupIDParam : modal.querySelector('.groupID select').value;
+        let dataDict = {apiaryID: apiaryID, groupID: groupID};
+
+        // Get dropdown data
+        $.ajax({
+            url: '/occupiedhives',
+            type: 'POST',
+            dataType: 'json',
+            data: dataDict,
+            success: function(data){
+                if(data && data.length){
+                    select.innerHTML = '';
+                    let disableFlag = false;
+    
+                    data.forEach(e => {
+                        let opt = document.createElement('option');
+                        opt.value = e.ID;
+                        opt.innerHTML = e.Number;
+                        if(parseInt(hiveID, 10) === e.ID){
+                            opt.selected = true;
+                            disableFlag = true;
+                        }
+                        select.appendChild(opt);
+                    });
+                    select.disabled = disableFlag;
+                }else{
+                    select.innerHTML = '';
+                }
+            },
+            error: function( jqXhr, textStatus, errorThrown ){
+                createAlert(jqXhr.responseText, 'Error');
+            }
+        })
+    }
+}
+
 function familiesDropdown(modal){
     let select = modal.querySelector('.parentID select');
 
@@ -276,9 +322,10 @@ function familyAttributeDropdown(modal, attrDict){
             success: function(data){
                 if(data){
 					for(let i in attrDict.name){
-						select[i].innerHTML = '';
+                        if(select[i])
+						    select[i].innerHTML = '';
 						
-						if(data[attrDict.name[i]] != undefined){
+						if(data[attrDict.name[i]] != undefined && select[i]){
 							data[attrDict.name[i]].forEach(e => {
 								let opt = document.createElement('option');
 								opt.value = e.Attribute;
@@ -318,6 +365,21 @@ function onChangeGroup(elem){
     let modal = $(elem).closest('.modal')[0];
     
     hivesDropdown(modal);
+}
+
+function onChangeApiaryOccupied(elem){
+    let modal = $(elem).closest('.modal')[0];
+    if(modal.querySelector('.groupID select'))
+		modal.querySelector('.groupID select').value = null;
+    
+    groupsDropdown(modal);
+    occupiedHivesDropdown(modal);
+}
+
+function onChangeGroupOccupied(elem){
+    let modal = $(elem).closest('.modal')[0];
+    
+    occupiedHivesDropdown(modal);
 }
 
 function onChangePriceInfluence(elem){

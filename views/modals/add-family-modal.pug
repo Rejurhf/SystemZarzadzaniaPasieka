@@ -1,5 +1,5 @@
 div(id="modalAddFamily" class="modal")
-    .modal-content(action="/family" action-type="POST")
+    .modal-content(action="/family" action-type="POST" grid-refresh="True")
         .modal-header
             span(class="close" onclick="closeModal(this)") &times;
             h2 Dodaj Rodzinę
@@ -47,5 +47,5 @@ div(id="modalAddFamily" class="modal")
                     textarea(name="comment", cols="30", rows="2")
         hr
         .modal-footer
-            button(onclick="closeModal(this)") Anuluj
+            button.secondary(onclick="closeModal(this)") Anuluj
             button(onclick="validateModal(this)") Dodaj

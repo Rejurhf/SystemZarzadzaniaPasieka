@@ -73,6 +73,15 @@ button:hover{
     border-color: 1px solid #098ec2;
 }
 
+button.secondary {
+    background-color: #999;
+    border-color: #888;
+}
+
+button.secondary:hover {
+    background-color: #aaa;
+}
+
 /* ---------------- Table ---------------- */
 .table, .table td, .table tr{
     border-collapse: collapse;

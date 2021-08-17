@@ -1,6 +1,6 @@
 
 div(id="modalDeleteFamily" class="modal")
-    .modal-content(action="/family" action-type="DELETE")
+    .modal-content(action="/family" action-type="DELETE" grid-refresh="True")
         .modal-header
             span(class="close" onclick="closeModal(this)") &times;
             h2 Usuń Rodzinę
@@ -39,5 +39,5 @@ div(id="modalDeleteFamily" class="modal")
                     textarea(name="comment", cols="30", rows="2")
         hr
         .modal-footer
-            button(onclick="closeModal(this)") Anuluj
+            button.secondary(onclick="closeModal(this)") Anuluj
             button(onclick="validateModal(this)") Usuń

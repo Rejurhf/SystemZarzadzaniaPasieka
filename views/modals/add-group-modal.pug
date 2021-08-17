@@ -1,5 +1,5 @@
 div(id="modalAddGroup" class="modal")
-    .modal-content(action="/group" action-type="POST")
+    .modal-content(action="/group" action-type="POST" grid-refresh="True")
         .modal-header
             span(class="close" onclick="closeModal(this)") &times;
             h2 Dodaj Grupę
@@ -18,5 +18,5 @@ div(id="modalAddGroup" class="modal")
                         name="creationDate") 
         hr
         .modal-footer
-            button(onclick="closeModal(this)") Anuluj
+            button.secondary(onclick="closeModal(this)") Anuluj
             button(onclick="validateModal(this)") Dodaj

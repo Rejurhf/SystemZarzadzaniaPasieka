@@ -185,6 +185,21 @@ router.post('/family', (req, res) => {
     }
 });
 
+// Actions -------------------------------------------------------------------------------
+// Add Inspection
+router.post('/inspection', (req, res) => {
+    let sUser = req.session.user;
+    logger.consoleLog(new Date(), ['POST /inspection:', req.body]);
+
+    if(sUser == null || sUser == undefined){
+        logger.consoleLog(new Date(), ['POST /inspection:', 'User not authorized']);
+        res.status(401).send('Nie znaleziono użytkownika spróbuj przeładować stronę.');
+    }else{
+        res.status(201).send({
+            isError: false, severity: 'Success', 
+            message: `Przeegląd`});
+    }
+});
 
 
 module.exports = router;

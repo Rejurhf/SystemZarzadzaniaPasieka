@@ -1,9 +1,29 @@
 extends ../layout
 include ../includes/header-links
 
+append styles 
+    link(rel="stylesheet" href="/css/modal.css")
+
+append scripts 
+    script(src='js/modal.js')
+    script(src='js/jQuery.js')
+    script(src='js/actionsMain.js')
+
 append links
     +header('Akcje')
     
 block content
-    .dashboard 
-        h1 Akcje
+    #dashboard 
+        .title-container
+            h1 Akcje
+        .button-container
+            button(onclick="loadInspection()") Przegląd
+            button(onclick="loadFeeding()") Podkarmianie
+            button(onclick="loadHarvesting()") Wybieranie miodu
+            button(onclick="loadTreatment()") Leczenie   
+
+    .modal-container
+        include ../modals/inspection-modal
+        include ../modals/feeding-modal
+        include ../modals/harvesting-modal
+        include ../modals/treatment-modal

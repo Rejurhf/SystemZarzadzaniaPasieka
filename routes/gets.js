@@ -63,7 +63,7 @@ router.post('/groups', (req, res) => {
     }
 })
 
-// Get Hives for group
+// Get free Hives for group
 router.post('/hives', (req, res) => {
     let apiaryID = req.body.apiaryID; 
     let groupID = req.body.groupID; 
@@ -84,6 +84,39 @@ router.post('/hives', (req, res) => {
             apiary.getUserApiaries(sUserID, function(result){
                 if(result.length){
                     apiary.getFreeUserHives(result[0].ID, parseInt(groupID), function(result){
+                        res.json(result);
+                    })
+                }else
+                    res.json({});
+            })
+        }
+    }else{
+        logger.consoleLog(new Date(), ['GET /hives:', 'User not authorized']);
+        res.status(401).send('Nie znaleziono użytkownika spróbuj przeładować stronę.');
+    }
+})
+
+// Get occupied Hives for group
+router.post('/occupiedhives', (req, res) => {
+    let apiaryID = req.body.apiaryID; 
+    let groupID = req.body.groupID; 
+    let sUserID = req.session.user.ID;
+    
+    logger.consoleLog(new Date(), ['GET /occupiedhives', apiaryID, groupID]);
+    
+    if(sUserID){
+        if(apiaryID && apiaryID != ''){
+            apiary.getOccupiedUserHives(parseInt(apiaryID), parseInt(groupID), function(result){
+                logger.consoleLog(new Date(), ['GET /hives', result]);
+                if(result)
+                    res.json(result);
+                else
+                    res.json({});
+            })
+        }else{
+            apiary.getUserApiaries(sUserID, function(result){
+                if(result.length){
+                    apiary.getOccupiedUserHives(result[0].ID, parseInt(groupID), function(result){
                         res.json(result);
                     })
                 }else

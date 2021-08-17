@@ -189,11 +189,37 @@ Apiary.prototype = {
                 FROM hive H
                     LEFT JOIN family F
                         ON F.HiveID = H.ID
-                        AND F.Active
+                        AND F.Active = 1
                 WHERE H.ApiaryID = ?
                     AND ((H.GroupID IS NULL AND ? < 1)
                         OR H.GroupID = ?)
                     AND F.ID IS NULL
+                    AND H.Active = 1
+                ORDER BY H.Number`
+
+        let bind = [apiaryID, inGroupID, inGroupID];
+
+        pool.query(sql, bind, function(err, result){
+            if(err) throw err;
+
+            if(result.length) {
+                callback(result);
+            }else
+                callback(null);
+        })
+    },
+    
+    getOccupiedUserHives: function(apiaryID, groupID, callback){
+        let inGroupID = groupID ? groupID : 0;
+
+        let sql = `SELECT H.ID, H.Number
+                FROM hive H
+                    JOIN family F
+                        ON F.HiveID = H.ID
+                        AND F.Active = 1
+                WHERE H.ApiaryID = ?
+                    AND ((H.GroupID IS NULL AND ? < 1)
+                        OR H.GroupID = ?)
                     AND H.Active = 1
                 ORDER BY H.Number`
 
