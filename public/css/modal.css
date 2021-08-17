@@ -112,6 +112,10 @@
     height: 25px;
 }
 
+.inputBox .select2-container{
+    margin: 4px;
+}
+
 /* ---------------- Other ---------------- */
 .notValid{
     box-shadow: 0 0 6px rgb(209, 0, 0);

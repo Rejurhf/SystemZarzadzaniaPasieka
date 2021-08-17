@@ -3,11 +3,13 @@ include ../includes/header-links
 
 append styles 
     link(rel="stylesheet" href="/css/modal.css")
+    link(rel="stylesheet" href="css/select2.min.css")
 
 append scripts 
     script(src='js/modal.js')
     script(src='js/jQuery.js')
     script(src='js/actionsMain.js')
+    script(src='js/select2.min.js')
 
 append links
     +header('Akcje')
@@ -17,10 +19,10 @@ block content
         .title-container
             h1 Akcje
         .button-container
-            button(onclick="loadInspection()") Przegląd
-            button(onclick="loadFeeding()") Podkarmianie
-            button(onclick="loadHarvesting()") Wybieranie miodu
-            button(onclick="loadTreatment()") Leczenie   
+            button.primary(onclick="loadInspection()") Przegląd
+            button.primary(onclick="loadFeeding()") Podkarmianie
+            button.primary(onclick="loadHarvesting()") Wybieranie miodu
+            button.primary(onclick="loadTreatment()") Leczenie   
 
     .modal-container
         include ../modals/inspection-modal

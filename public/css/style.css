@@ -57,7 +57,7 @@ nav .selected{
 }
 
 /* ---------------- Button ---------------- */
-button{
+button.primary{
     padding: 7px 20px;
     font-size: 1.06em;
     background-color: #0796cf;
@@ -68,14 +68,20 @@ button{
     border-radius: 2px;
 }
 
-button:hover{
+button.primary:hover{
     background-color: #0fa3dd;
     border-color: 1px solid #098ec2;
 }
 
 button.secondary {
+    padding: 7px 20px;
+    font-size: 1.06em;
+    color: #fff;
+    cursor: pointer;
+    margin: 4px;
+    border-radius: 2px;
     background-color: #999;
-    border-color: #888;
+    border: solid 1px #888;
 }
 
 button.secondary:hover {

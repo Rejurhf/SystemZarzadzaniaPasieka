@@ -13,6 +13,7 @@ app.use(express.urlencoded({extended: false}));
 
 // Serve static files.
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'node_modules/select2/dist')));
 
 // Template engine
 app.set('views', path.join(__dirname, 'views'));

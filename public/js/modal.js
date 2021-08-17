@@ -41,7 +41,12 @@ function validateModal(elem){
                 isValid = false;
                 e.classList.add('notValid');
             }
-            dataDict[e.name] = e.value;
+			if(e.classList.contains('js-example-basic-multiple')){
+				let arr = []
+				$(e).select2('data').forEach(f => arr.push(f.id));
+				dataDict[e.name] = arr;
+			}else
+				dataDict[e.name] = e.value;
         }
     })
     modal.querySelectorAll('textarea').forEach(e => {
@@ -53,7 +58,7 @@ function validateModal(elem){
             dataDict[e.name] = e.value;
         }
     })
-    
+    console.log(dataDict);
     if (isValid){
         submitForm(modal, dataDict);
     }
@@ -277,8 +282,8 @@ function occupiedHivesDropdown(modal, apiaryIDParam, groupIDParam, hiveID){
     }
 }
 
-function familiesDropdown(modal){
-    let select = modal.querySelector('.parentID select');
+function familiesDropdown(modal, selectName){
+    let select = modal.querySelector(`.${selectName} select`);
 
     // Get dropdown data
     if(select){

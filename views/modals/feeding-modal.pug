@@ -1,19 +1,23 @@
 
 div(id="modalFeeding" class="modal")
-    .modal-content(action="/feeding" action-type="POST")
-        .modal-header
-            span(class="close" onclick="closeModal(this)") &times;
-            h2 Podkarmianie
-        .modal-body
-            form
-                .inputBox.apiaryName
-                    label Nazwa: 
-                    input(type="text" not-null="true" name="apiaryName")
-                .inputBox.creationDate
-                    label Data stworzenia:
-                    input(type="date" not-null="true" 
-                        name="creationDate") 
-        hr
-        .modal-footer
-            button.secondary(onclick="closeModal(this)") Anuluj
-            button(onclick="validateModal(this)") Dodaj
+	.modal-content(action="/feeding" action-type="POST")
+		.modal-header
+			span(class="close" onclick="closeModal(this)") &times;
+			h2 Podkarmianie
+		.modal-body
+			form
+				.inputBox.creationDate
+					label Data stworzenia:
+					input(type="date" not-null="true" 
+						name="creationDate") 
+				.inputBox.familyID
+					label Ule: 
+					select.js-example-basic-multiple(name="familyID" multiple="multiple")
+						option(value="")
+				.inputBox.comment
+					label Uwagi: 
+					textarea(name="comment", cols="30", rows="2")
+		hr
+		.modal-footer
+			button.secondary(onclick="closeModal(this)") Anuluj
+			button.primary(onclick="validateModal(this)") Dodaj

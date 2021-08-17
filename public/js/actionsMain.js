@@ -1,4 +1,8 @@
 
+$(document).ready(function() {
+    $('.js-example-basic-multiple').select2();
+});
+
 // Action functions ----------------------------------------------------------------------
 function loadInspection(dataDict){
     let modal = document.getElementById('modalInspection'); 
@@ -22,6 +26,8 @@ function loadFeeding(){
     let modal = document.getElementById('modalFeeding'); 
     modal.style.display = 'block';
     modal.querySelector('.creationDate input').value = dateToInputString(new Date());
+
+    familiesDropdown(modal, 'familyID');
 }
 
 function loadHarvesting(){

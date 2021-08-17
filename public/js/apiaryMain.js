@@ -323,7 +323,7 @@ function loadAddFamily(dataDict){
     groupsDropdown(modal, apiaryID, groupID);
     hivesDropdown(modal, apiaryID, groupID, hiveID);
     familyAttributeDropdown(modal, attrDict);
-    familiesDropdown(modal);
+    familiesDropdown(modal, 'parentID');
 }
 
 // Delete functions ----------------------------------------------------------------------
