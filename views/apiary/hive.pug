@@ -1,6 +1,10 @@
 extends ../layout
 include ../includes/header-links
 
+append scripts 
+    script(src='../../js/qrcode.min.js')
+    script(src='../../js/hiveMain.js')
+    script(src='../../js/jQuery.js')
 
 append links
     +header('Pasieka')
@@ -10,4 +14,6 @@ block content
         .title-container
             h1 Ul
             span=hiveID
+
+        #qr-code
         

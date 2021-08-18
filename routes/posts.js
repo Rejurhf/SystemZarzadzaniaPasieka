@@ -215,4 +215,18 @@ router.post('/feeding', (req, res) => {
     }
 });
 
+router.post('/treatment', (req, res) => {
+    let sUser = req.session.user;
+    logger.consoleLog(new Date(), ['POST /treatment:', req.body]);
+
+    if(sUser == null || sUser == undefined){
+        logger.consoleLog(new Date(), ['POST /treatment:', 'User not authorized']);
+        res.status(401).send('Nie znaleziono użytkownika spróbuj przeładować stronę.');
+    }else{
+        res.status(201).send({
+            isError: false, severity: 'Success', 
+            message: `Leczenie`});
+    }
+});
+
 module.exports = router;

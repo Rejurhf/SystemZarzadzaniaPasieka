@@ -1,19 +1,29 @@
 
 div(id="modalTreatment" class="modal")
-    .modal-content(action="/treatment" action-type="POST")
-        .modal-header
-            span(class="close" onclick="closeModal(this)") &times;
-            h2 Leczenie
-        .modal-body
-            form
-                .inputBox.apiaryName
-                    label Nazwa: 
-                    input(type="text" not-null="true" name="apiaryName")
-                .inputBox.creationDate
-                    label Data stworzenia:
-                    input(type="date" not-null="true" 
-                        name="creationDate") 
-        hr
-        .modal-footer
-            button.secondary(onclick="closeModal(this)") Anuluj
-            button.primary(onclick="validateModal(this)") Dodaj
+	.modal-content(action="/treatment" action-type="POST")
+		.modal-header
+			span(class="close" onclick="closeModal(this)") &times;
+			h2 Leczenie
+		.modal-body
+			form
+				.inputBox.creationDate
+					label Data stworzenia:
+					input(type="date" not-null="true" name="creationDate") 
+				.inputBox.disease
+					label Choroba: 
+					input(type="text" not-null="true" name="disease")
+				.inputBox.medicine
+					label Lekarstwo: 
+					input(type="text" not-null="true" name="medicine")
+				.inputBox.familyID
+					label Ule: 
+					select.js-example-basic-multiple(name="familyID" multiple="multiple" 
+							not-null="true")
+						option(value="")
+				.inputBox.comment
+					label Uwagi: 
+					textarea(name="comment", cols="30", rows="2")
+		hr
+		.modal-footer
+			button.secondary(onclick="closeModal(this)") Anuluj
+			button.primary(onclick="validateModal(this)") Dodaj

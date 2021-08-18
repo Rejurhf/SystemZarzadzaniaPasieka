@@ -24,6 +24,10 @@ function validateModal(elem){
     let isValid = true;
     let modal = elem.parentElement.parentElement;
     let dataDict = {};
+	
+    modal.querySelectorAll('input').forEach(e => {e.classList.remove('notValid')});
+    modal.querySelectorAll('select').forEach(e => {e.classList.remove('notValid')});
+    modal.querySelectorAll('span').forEach(e => {e.classList.remove('notValid')});
 
     modal.querySelectorAll('input').forEach(e => {
         if(e.name != null && e.name != undefined && e.name != '' && !dataDict[e.name]){
@@ -40,11 +44,13 @@ function validateModal(elem){
             if(e.getAttribute('not-null') === 'true' && !e.value){
                 isValid = false;
                 e.classList.add('notValid');
+				e.parentElement.querySelector('span').classList.add('notValid');
             }
 			if(e.classList.contains('js-example-basic-multiple')){
 				let arr = []
 				$(e).select2('data').forEach(f => arr.push(f.id));
 				dataDict[e.name] = arr;
+				console.log([$(e).select2('data'), $(e).select2('data').length]);
 			}else
 				dataDict[e.name] = e.value;
         }
@@ -58,7 +64,7 @@ function validateModal(elem){
             dataDict[e.name] = e.value;
         }
     })
-    console.log(dataDict);
+	
     if (isValid){
         submitForm(modal, dataDict);
     }
@@ -76,7 +82,7 @@ function submitForm(modal, dataDict) {
         data: dataDict,
         success: function(data){
             createAlert(data.message, data.severity);
-            if(isGridRefresh === 'True'){
+            if(isGridRefresh === 'true'){
                 generateGridView();
             }
             if(!data.isError){
@@ -97,6 +103,7 @@ function closeModal(elem){
     modal.parentElement.style.display = 'none';
     modal.querySelectorAll('input').forEach(e => {e.classList.remove('notValid')});
     modal.querySelectorAll('select').forEach(e => {e.classList.remove('notValid')});
+    modal.querySelectorAll('span').forEach(e => {e.classList.remove('notValid')});
 	if(modal.querySelector('.apiaryID select'))
 		modal.querySelector('.apiaryID select').value = null;
 	if(modal.querySelector('.groupID select'))

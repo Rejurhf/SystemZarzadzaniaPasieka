@@ -8,11 +8,11 @@ div(id="modalFeeding" class="modal")
 			form
 				.inputBox.creationDate
 					label Data stworzenia:
-					input(type="date" not-null="true" 
-						name="creationDate") 
+					input(type="date" not-null="true" name="creationDate") 
 				.inputBox.familyID
 					label Ule: 
-					select.js-example-basic-multiple(name="familyID" multiple="multiple")
+					select.js-example-basic-multiple(name="familyID" multiple="multiple" 
+							not-null="true")
 						option(value="")
 				.inputBox.comment
 					label Uwagi: 

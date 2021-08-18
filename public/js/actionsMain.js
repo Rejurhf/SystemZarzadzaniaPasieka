@@ -34,10 +34,14 @@ function loadHarvesting(){
     let modal = document.getElementById('modalHarvesting'); 
     modal.style.display = 'block';
     modal.querySelector('.creationDate input').value = dateToInputString(new Date());
+    
+    familiesDropdown(modal, 'familyID');
 }
 
 function loadTreatment(){
     let modal = document.getElementById('modalTreatment'); 
     modal.style.display = 'block';
     modal.querySelector('.creationDate input').value = dateToInputString(new Date());
+    
+    familiesDropdown(modal, 'familyID');
 }

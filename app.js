@@ -1,6 +1,7 @@
 
 const express = require('express');
 const session = require('express-session');
+const qr = require("qrcode");
 const path = require('path');
 const pageRouter = require('./routes/pages');
 const postsRouter = require('./routes/posts');
