@@ -458,6 +458,24 @@ Apiary.prototype = {
 
         return;
     },
+    
+    findActiveFamily: async function(hiveID){
+        let sql = `SELECT ID 
+                FROM family
+                WHERE HiveID = ?
+                    AND Active = 1`;
+
+        try {
+            let result = await pool.query(sql, [hiveID]);
+            
+            if(result.length)
+                return result[0];
+        } catch (err){
+            throw new Error(err);
+        }
+
+        return;
+    },
 
     // Create ----------------------------------------------------------------------------
     createApiary: async function(name, creationDate, createdBy, userID, callback){

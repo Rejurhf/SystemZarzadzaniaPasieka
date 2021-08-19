@@ -24,6 +24,10 @@ router.get('/apiaries', (req, res) => {
 // Get Family Attributes
 router.post('/familyattributes', (req, res) => {
     let sUser = req.session.user; 
+    if(!Array.isArray(req.body['name[]'])){
+        req.body['name[]'] = [req.body['name[]']];
+        req.body['type[]'] = [req.body['type[]']];
+    }
     logger.consoleLog(new Date(), ['GET /familyattributes', req.body]);
     
     if(sUser){
