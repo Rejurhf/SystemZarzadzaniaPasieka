@@ -1,51 +1,51 @@
 div(id="modalAddFamily" class="modal")
-    .modal-content(action="/family" action-type="POST" grid-refresh="true")
-        .modal-header
-            span(class="close" onclick="closeModal(this)") &times;
-            h2 Dodaj Rodzinę
-        .modal-body
-            form
-                .inputBox.apiaryID
-                    label Pasieka: 
-                    select(not-null="true" name="apiaryID" 
-                            onchange="onChangeApiary(this)")
-                        option(value="")
-                .inputBox.groupID
-                    label Nazwa grupy: 
-                    select(name="groupID" onchange="onChangeGroup(this)")
-                        option(value="")
-                .inputBox.hiveID
-                    label Numer ula: 
-                    select(not-null="true" name="hiveID")
-                        option(value="")
-                .inputBox.creationDate
-                    label Data stworzenia:
-                    input(type="date" not-null="true" 
-                        name="creationDate") 
-                .inputBox.state
-                    label Stan: 
-                    select(not-null="true" name="state")
-                        option(value="")
-                .inputBox.size
-                    label Wielkość: 
-                    select(not-null="true" name="size")
-                        option(value="")
-                .inputBox.origin
-                    label Pochodzenie: 
-                    select(not-null="true" name="origin" 
-                            onchange="onChangePriceInfluence(this)")
-                        option(value="")
-                .inputBox.parentID
-                    label Ul macierzysty: 
-                    select(name="parentID")
-                        option(value="")
-                .inputBox.price
-                    label Cena: 
-                    input(type="number" step="0.01" name="price")
-                .inputBox.comment
-                    label Uwagi: 
-                    textarea(name="comment", cols="30", rows="2")
-        hr
-        .modal-footer
-            button.secondary(onclick="closeModal(this)") Anuluj
-            button.primary(onclick="validateModal(this)") Dodaj
+	.modal-content(action="/family" action-type="POST" grid-refresh="true")
+		.modal-header
+			span(class="close" onclick="closeModal(this)") &times;
+			h2 Dodaj Rodzinę
+		.modal-body
+			form
+				.inputBox.apiaryID
+					label Pasieka: 
+					select(not-null="true" name="apiaryID" 
+							onchange="onChangeApiary(this)")
+						option(value="")
+				.inputBox.groupID
+					label Nazwa grupy: 
+					select(name="groupID" onchange="onChangeGroup(this)")
+						option(value="")
+				.inputBox.hiveID
+					label Numer ula: 
+					select(not-null="true" name="hiveID")
+						option(value="")
+				.inputBox.creationDate
+					label Data stworzenia:
+					input(type="date" not-null="true" 
+						name="creationDate") 
+				.inputBox.state
+					label Stan: 
+					select(not-null="true" name="state")
+						option(value="")
+				.inputBox.size
+					label Wielkość: 
+					select(not-null="true" name="size")
+						option(value="")
+				.inputBox.origin
+					label Pochodzenie: 
+					select(not-null="true" name="origin" 
+							onchange="onChangePriceInfluence(this)")
+						option(value="")
+				.inputBox.parentID
+					label Ul macierzysty: 
+					select(name="parentID")
+						option(value="")
+				.inputBox.price
+					label Cena: 
+					input(type="number" step="0.01" name="price")
+				.inputBox.comment
+					label Uwagi: 
+					textarea(name="comment", cols="30", rows="2")
+		hr
+		.modal-footer
+			button.secondary(onclick="closeModal(this)") Anuluj
+			button.primary(onclick="validateModal(this)") Dodaj

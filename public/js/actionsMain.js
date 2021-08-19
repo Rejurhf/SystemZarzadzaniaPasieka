@@ -34,8 +34,11 @@ function loadHarvesting(){
     let modal = document.getElementById('modalHarvesting'); 
     modal.style.display = 'block';
     modal.querySelector('.creationDate input').value = dateToInputString(new Date());
+	let attrDict = {name: ['honeyType', 'a'],
+					type: ['HONEY_TYPE', 'a']};
     
     familiesDropdown(modal, 'familyID');
+    familyAttributeDropdown(modal, attrDict);
 }
 
 function loadTreatment(){

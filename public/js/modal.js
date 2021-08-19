@@ -50,7 +50,6 @@ function validateModal(elem){
 				let arr = []
 				$(e).select2('data').forEach(f => arr.push(f.id));
 				dataDict[e.name] = arr;
-				console.log([$(e).select2('data'), $(e).select2('data').length]);
 			}else
 				dataDict[e.name] = e.value;
         }

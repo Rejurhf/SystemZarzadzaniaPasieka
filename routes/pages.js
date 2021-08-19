@@ -1,6 +1,8 @@
 
 const express = require('express');
 const router = express.Router();
+const Logger = require('../core/logger');
+const logger = new Logger();
 
 
 // Login ---------------------------------------------------------------------------------
@@ -54,10 +56,10 @@ router.get('/apiary', (req, res, next) => {
 // Go to Hive page
 router.get('/apiary/hive/:hiveId', (req, res, next) => {
     let user = req.session.user;
-    console.log(['GET /apiary/hive/', req.params.hiveId]);
+    logger.consoleLog(new Date(), ['GET /apiary/hive/', req.params.hiveId]);
 
     if(user){
-        res.render('apiary/hive', {name:user.FirstName, hiveID:req.params.hiveId});
+        res.render('apiary/hive', {hiveID:req.params.hiveId});
         return;
     }
     res.redirect('/');

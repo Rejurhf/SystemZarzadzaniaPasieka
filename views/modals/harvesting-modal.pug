@@ -6,13 +6,16 @@ div(id="modalHarvesting" class="modal")
 			h2 Wybieranie miodu
 		.modal-body
 			form
-				.inputBox.apiaryName
-					label Nazwa: 
-					input(type="text" not-null="true" name="apiaryName")
 				.inputBox.creationDate
 					label Data stworzenia:
-					input(type="date" not-null="true" 
-						name="creationDate") 
+					input(type="date" not-null="true" name="creationDate") 
+				.inputBox.honeyType
+					label Rodzaj miodu: 
+					select(not-null="true" name="honeyType")
+						option(value="")
+				.inputBox.amountLiter
+					label Ilość [l]: 
+					input(type="number" name="amountLiter" not-null="true")
 				.inputBox.familyID
 					label Ule: 
 					select.js-example-basic-multiple(name="familyID" multiple="multiple" 
