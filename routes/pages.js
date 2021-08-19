@@ -77,13 +77,13 @@ router.get('/actions', (req, res, next) => {
     res.redirect('/');
 })
 
-// History -------------------------------------------------------------------------------
-// Get History page 
-router.get('/history', (req, res, next) => {
+// Info -------------------------------------------------------------------------------
+// Get Info page 
+router.get('/info', (req, res, next) => {
     let user = req.session.user;
 
     if(user){
-        res.render('history/history', {name:user.FirstName});
+        res.render('info/info', {name:user.FirstName});
         return;
     }
     res.redirect('/');

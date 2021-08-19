@@ -3,7 +3,7 @@
 //- 2 - Akcje
 //- 3 - Historia
 mixin header(tab)
-    each val, key in {'/': 'Home', '/apiary': 'Pasieka', '/actions': 'Akcje', '/history': 'Historia'}
+    each val, key in {'/': 'Home', '/apiary': 'Pasieka', '/actions': 'Akcje', '/info': 'Info'}
         li
             if val == tab 
                 a(class="selected" href= key)= val
